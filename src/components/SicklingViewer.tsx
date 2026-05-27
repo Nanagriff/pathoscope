@@ -147,6 +147,49 @@ export default function SicklingViewer({ sicklingRate: defaultRate, fields: fiel
     return () => svg.removeEventListener("wheel", onWheel);
   }, [applyCamera]);
 
+  // ── Touch: pinch-to-zoom + two-finger pan (mobile) ──
+  const touchRef = useRef<{ startDist: number; startZoom: number; startMidX: number; startMidY: number; camStartX: number; camStartY: number } | null>(null);
+
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const getDist = (t1: Touch, t2: Touch) => Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+    const getMid = (t1: Touch, t2: Touch) => ({ x: (t1.clientX + t2.clientX) / 2, y: (t1.clientY + t2.clientY) / 2 });
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const cam = cameraRef.current;
+        const d = getDist(e.touches[0], e.touches[1]);
+        const mid = getMid(e.touches[0], e.touches[1]);
+        touchRef.current = { startDist: d, startZoom: cam.zoom, startMidX: mid.x, startMidY: mid.y, camStartX: cam.x, camStartY: cam.y };
+        if (dragRef.current) dragRef.current.active = false;
+      }
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && touchRef.current) {
+        e.preventDefault();
+        const cam = cameraRef.current;
+        const rect = svg.getBoundingClientRect();
+        const d = getDist(e.touches[0], e.touches[1]);
+        const mid = getMid(e.touches[0], e.touches[1]);
+        const scale = d / touchRef.current.startDist;
+        const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, touchRef.current.startZoom * scale));
+        const panScale = (SLIDE_W / cam.zoom) / rect.width;
+        cam.x = touchRef.current.camStartX - (mid.x - touchRef.current.startMidX) * panScale;
+        cam.y = touchRef.current.camStartY - (mid.y - touchRef.current.startMidY) * panScale;
+        cam.zoom = newZoom;
+        setZoom(newZoom); applyCamera();
+      }
+    };
+    const onTouchEnd = () => { touchRef.current = null; };
+
+    svg.addEventListener("touchstart", onTouchStart, { passive: false });
+    svg.addEventListener("touchmove", onTouchMove, { passive: false });
+    svg.addEventListener("touchend", onTouchEnd);
+    return () => { svg.removeEventListener("touchstart", onTouchStart); svg.removeEventListener("touchmove", onTouchMove); svg.removeEventListener("touchend", onTouchEnd); };
+  }, [applyCamera]);
+
   const changeField = useCallback((idx: number) => {
     if (idx === currentField) return;
     setTransitioning(true); setActiveCell(null);

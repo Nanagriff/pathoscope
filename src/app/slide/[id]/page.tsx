@@ -6,6 +6,7 @@ import SVGSlideViewer from "@/components/SVGSlideViewer";
 import SicklingViewer from "@/components/SicklingViewer";
 import SlideSidebar from "@/components/SlideSidebar";
 import MobileSidebarToggle from "@/components/MobileSidebarToggle";
+import SlideOnboarding from "@/components/SlideOnboarding";
 
 export function generateStaticParams() {
   return cases.map((c) => ({ id: c.id }));
@@ -48,7 +49,7 @@ export default async function SlidePage({
       {/* Main content */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Viewer */}
-        <div className="flex-1 min-w-0 min-h-0">
+        <div className="flex-1 min-w-0 min-h-0 relative">
           {sickling ? (
             <SicklingViewer
               sicklingRate={sickling.sicklingRate}
@@ -62,10 +63,13 @@ export default async function SlidePage({
               species={svg.species}
               stage={svg.stage}
               showFilmToggle={slideCase.discipline === "malaria"}
+              initialFilmType={slideCase.discipline === "malaria" ? "thick" : undefined}
             />
           ) : (
             <SlideViewer fields={slideCase.fields} />
           )}
+          {/* First-time onboarding overlay */}
+          <SlideOnboarding isMalaria={slideCase.discipline === "malaria"} />
         </div>
 
         {/* Desktop sidebar */}

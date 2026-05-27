@@ -421,7 +421,7 @@ export default function SVGSlideViewer({
     if (dragRef.current) dragRef.current.active = false;
   }, []);
 
-  // ── Wheel zoom ──
+  // ── Wheel zoom (desktop) ──
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
@@ -448,6 +448,62 @@ export default function SVGSlideViewer({
     svg.addEventListener("wheel", onWheel, { passive: false });
     return () => svg.removeEventListener("wheel", onWheel);
   }, [applyCamera]);
+
+  // ── Touch: pinch-to-zoom + two-finger pan (mobile) ──
+  const touchRef = useRef<{ startDist: number; startZoom: number; startMidX: number; startMidY: number; camStartX: number; camStartY: number } | null>(null);
+
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+
+    const getDist = (t1: Touch, t2: Touch) => Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+    const getMid = (t1: Touch, t2: Touch) => ({ x: (t1.clientX + t2.clientX) / 2, y: (t1.clientY + t2.clientY) / 2 });
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const cam = cameraRef.current;
+        const d = getDist(e.touches[0], e.touches[1]);
+        const mid = getMid(e.touches[0], e.touches[1]);
+        touchRef.current = { startDist: d, startZoom: cam.zoom, startMidX: mid.x, startMidY: mid.y, camStartX: cam.x, camStartY: cam.y };
+        // Stop single-finger drag while pinching
+        if (dragRef.current) dragRef.current.active = false;
+      }
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && touchRef.current) {
+        e.preventDefault();
+        const cam = cameraRef.current;
+        const rect = svg.getBoundingClientRect();
+        const d = getDist(e.touches[0], e.touches[1]);
+        const mid = getMid(e.touches[0], e.touches[1]);
+        const scale = d / touchRef.current.startDist;
+        const newZoom = Math.min(maxZoom, Math.max(MIN_ZOOM, touchRef.current.startZoom * scale));
+
+        // Pan based on midpoint movement
+        const panScale = (SLIDE_W / cam.zoom) / rect.width;
+        const dx = mid.x - touchRef.current.startMidX;
+        const dy = mid.y - touchRef.current.startMidY;
+        cam.x = touchRef.current.camStartX - dx * panScale;
+        cam.y = touchRef.current.camStartY - dy * panScale;
+        cam.zoom = newZoom;
+        setZoom(newZoom);
+        applyCamera();
+      }
+    };
+
+    const onTouchEnd = () => { touchRef.current = null; };
+
+    svg.addEventListener("touchstart", onTouchStart, { passive: false });
+    svg.addEventListener("touchmove", onTouchMove, { passive: false });
+    svg.addEventListener("touchend", onTouchEnd);
+    return () => {
+      svg.removeEventListener("touchstart", onTouchStart);
+      svg.removeEventListener("touchmove", onTouchMove);
+      svg.removeEventListener("touchend", onTouchEnd);
+    };
+  }, [applyCamera, maxZoom]);
 
   // ── Animated zoom ──
   const zoomTo = useCallback((targetZoom: number) => {
