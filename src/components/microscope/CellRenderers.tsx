@@ -139,6 +139,24 @@ export function SlideDefs({ stain }: { stain: StainProfile }) {
         <feComposite in="ct" in2="SourceGraphic" operator="in" />
       </filter>
 
+      {/* ── Parasite stain texture — makes rings look like dyed material, not vectors ── */}
+      <filter id="parasite-tex" x="-15%" y="-15%" width="130%" height="130%">
+        <feTurbulence type="fractalNoise" baseFrequency="1.5" numOctaves="2" seed={23} result="pn" />
+        <feColorMatrix in="pn" type="saturate" values="0" result="pbw" />
+        <feBlend in="SourceGraphic" in2="pbw" mode="multiply" result="pt" />
+        <feGaussianBlur in="pt" stdDeviation="0.08" result="pblur" />
+        <feComposite in="pblur" in2="SourceGraphic" operator="in" />
+      </filter>
+
+      {/* ── Chromatin dot texture — organic dense nuclear material ── */}
+      <filter id="chromatin-tex" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency="2.0" numOctaves="3" seed={29} result="cn" />
+        <feColorMatrix in="cn" type="saturate" values="0" result="cbw2" />
+        <feBlend in="SourceGraphic" in2="cbw2" mode="multiply" result="ct2" />
+        <feGaussianBlur in="ct2" stdDeviation="0.06" result="cblur" />
+        <feComposite in="cblur" in2="SourceGraphic" operator="in" />
+      </filter>
+
       {/* ── Slight WBC softening — matches surrounding field focus ── */}
       <filter id="wbc-soft">
         <feGaussianBlur stdDeviation="0.12" />
@@ -234,21 +252,24 @@ function parasiteArc(
   cx: number, cy: number, r: number,
   startAngle: number, arcSpan: number,
 ): string {
-  const steps = 6 + Math.floor(rng() * 3);
+  // More points = smoother organic curve
+  const steps = 8 + Math.floor(rng() * 4);
   const pts: [number, number][] = [];
   for (let i = 0; i <= steps; i++) {
     const t = i / steps;
     const angle = startAngle + t * arcSpan;
-    const rVar = r * (1 + (rng() - 0.5) * 0.3); // ±15% radius wobble
+    // Higher wobble (±20%) + slight inward/outward drift along the arc
+    const drift = (rng() - 0.5) * 0.4;
+    const rVar = r * (1 + drift);
     pts.push([cx + Math.cos(angle) * rVar, cy + Math.sin(angle) * rVar]);
   }
   let d = `M${pts[0][0].toFixed(2)},${pts[0][1].toFixed(2)}`;
   for (let i = 1; i < pts.length; i++) {
-    // Simple quadratic curves between points for organic feel
     const prev = pts[i - 1];
     const curr = pts[i];
-    const cpx = (prev[0] + curr[0]) / 2 + (rng() - 0.5) * r * 0.2;
-    const cpy = (prev[1] + curr[1]) / 2 + (rng() - 0.5) * r * 0.2;
+    // Larger control point offset = more organic wobble
+    const cpx = (prev[0] + curr[0]) / 2 + (rng() - 0.5) * r * 0.35;
+    const cpy = (prev[1] + curr[1]) / 2 + (rng() - 0.5) * r * 0.35;
     d += `Q${cpx.toFixed(2)},${cpy.toFixed(2)},${curr[0].toFixed(2)},${curr[1].toFixed(2)}`;
   }
   return d;
@@ -480,29 +501,37 @@ export function ParasitizedRBC({ x, y, rotation, seed, depth, stain, onClick, se
             const inner2Cy = par.dot2Y !== undefined ? n(par.dot2Y + (rng() - 0.5) * (par.dot2R ?? 0) * 0.4) : 0;
             return (
               <g key={pi}>
-                {par.hasFaintHalo && (
-                  <circle cx={n(par.cx)} cy={n(par.cy)} r={n(par.r * 0.8)}
-                    fill={stain.parasiteDiffusion} filter="url(#parasite-glow)" />
-                )}
-                {par.arcPath && (
+                {/* Ring arc — layered strokes, NO blur, texture only */}
+                {par.arcPath && (<>
+                  {/* Wider faint stain spread */}
                   <path d={par.arcPath} fill="none" stroke={stain.parasiteRingStroke}
-                    strokeWidth={arcStrokeW} strokeOpacity={par.arcOpacity} strokeLinecap="round" />
-                )}
-                {par.arcPath && (
-                  <path d={par.arcPath} fill="none" stroke={stain.parasiteDiffusion}
-                    strokeWidth={diffStrokeW} strokeOpacity={0.15} strokeLinecap="round" filter="url(#parasite-glow)" />
-                )}
+                    strokeWidth={n(arcStrokeW * 1.8)} strokeOpacity={n(par.arcOpacity * 0.3)} strokeLinecap="round" />
+                  {/* Core ring — textured */}
+                  <path d={par.arcPath} fill="none" stroke={stain.parasiteRingStroke}
+                    strokeWidth={arcStrokeW} strokeOpacity={par.arcOpacity} strokeLinecap="round"
+                    filter="url(#parasite-tex)" />
+                </>)}
+
+                {/* Chromatin dot — NO blur, textured */}
+                <ellipse cx={n(par.dotX)} cy={n(par.dotY)} rx={n(par.dotR * 1.15)} ry={n(dotRy * 1.15)}
+                  transform={`rotate(${dotRot},${n(par.dotX)},${n(par.dotY)})`}
+                  fill={stain.chromatinPrimary} opacity={n(dotOp * 0.4)} />
                 <ellipse cx={n(par.dotX)} cy={n(par.dotY)} rx={n(par.dotR)} ry={dotRy}
                   transform={`rotate(${dotRot},${n(par.dotX)},${n(par.dotY)})`}
-                  fill={stain.chromatinPrimary} opacity={dotOp} />
-                <circle cx={innerDotCx} cy={innerDotCy} r={n(par.dotR * 0.45)}
-                  fill={stain.nucleusDenseChromatin} opacity={0.5} />
+                  fill={stain.chromatinPrimary} opacity={dotOp} filter="url(#chromatin-tex)" />
+                <circle cx={innerDotCx} cy={innerDotCy} r={n(par.dotR * 0.35)}
+                  fill={stain.nucleusDenseChromatin} opacity={0.6} />
+
+                {/* Second dot */}
                 {par.dot2X !== undefined && par.dot2R !== undefined && (<>
+                  <ellipse cx={n(par.dot2X)} cy={n(par.dot2Y!)} rx={n(par.dot2R * 1.1)} ry={n(dot2Ry * 1.1)}
+                    transform={`rotate(${dot2Rot},${n(par.dot2X)},${n(par.dot2Y!)})`}
+                    fill={stain.chromatinPrimary} opacity={n(dot2Op * 0.35)} />
                   <ellipse cx={n(par.dot2X)} cy={n(par.dot2Y!)} rx={n(par.dot2R)} ry={dot2Ry}
                     transform={`rotate(${dot2Rot},${n(par.dot2X)},${n(par.dot2Y!)})`}
-                    fill={stain.chromatinPrimary} opacity={dot2Op} />
-                  <circle cx={inner2Cx} cy={inner2Cy} r={n((par.dot2R ?? 0) * 0.4)}
-                    fill={stain.nucleusDenseChromatin} opacity={0.4} />
+                    fill={stain.chromatinPrimary} opacity={dot2Op} filter="url(#chromatin-tex)" />
+                  <circle cx={inner2Cx} cy={inner2Cy} r={n((par.dot2R ?? 0) * 0.3)}
+                    fill={stain.nucleusDenseChromatin} opacity={0.5} />
                 </>)}
               </g>
             );

@@ -82,7 +82,7 @@ export default async function DisciplinePage({
                   {c.clinicalHistory}
                 </p>
                 <div className="flex items-center gap-3 mt-2 text-[10px] text-gray-600">
-                  <span>{c.svgConfig?.fields.length ?? c.fields.length} fields</span>
+                  <span>{c.urineConfig?.fields.length ?? c.sicklingConfig?.fields.length ?? c.svgConfig?.fields.length ?? c.fields.length} fields</span>
                   <span>{c.teachingPoints.length} teaching points</span>
                 </div>
               </Link>

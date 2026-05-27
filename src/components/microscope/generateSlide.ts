@@ -375,17 +375,28 @@ export function generateSlide(config: SlideConfig): GeneratedSlide {
   // ── Sort by zIndex ──
   cells.sort((a, b) => a.zIndex - b.zIndex);
 
-  // ── Stain artifacts ──
+  // ── Stain artifacts — dense particles for realistic microscopy texture ──
 
   const artifacts: StainArtifact[] = [];
 
-  // Stain precipitate (tiny dark purple dots)
-  for (let i = 0; i < 30 + Math.floor(rng() * 20); i++) {
+  // Dense stain precipitate — hundreds of tiny specks across the field
+  for (let i = 0; i < 150 + Math.floor(rng() * 100); i++) {
     artifacts.push({
       x: rng() * width,
       y: rng() * height,
-      r: 0.15 + rng() * 0.3,
-      opacity: 0.2 + rng() * 0.3,
+      r: 0.08 + rng() * 0.25,
+      opacity: 0.1 + rng() * 0.3,
+      type: "precipitate",
+    });
+  }
+
+  // Medium debris particles — cell fragments, platelet dust
+  for (let i = 0; i < 40 + Math.floor(rng() * 30); i++) {
+    artifacts.push({
+      x: rng() * width,
+      y: rng() * height,
+      r: 0.3 + rng() * 0.5,
+      opacity: 0.06 + rng() * 0.12,
       type: "precipitate",
     });
   }

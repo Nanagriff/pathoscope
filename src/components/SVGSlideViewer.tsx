@@ -22,13 +22,12 @@ import {
   Lymphocyte,
   Monocyte,
   Platelet,
-} from "./microscope/CellRenderers";
-import {
   FreeRing,
   FreeTrophozoite,
   FreeSchizont,
   FreeGametocyte,
-} from "./microscope/ParasiteRenderers";
+} from "./microscope/renderers";
+import { GiemsaBackground, WrightGiemsaBackground } from "./microscope/backgrounds";
 
 // ── Constants ──
 
@@ -75,6 +74,8 @@ export interface SVGSlideViewerProps {
   examMode?: boolean;
   /** Force initial film type (for exam questions) */
   initialFilmType?: import("./microscope/types").FilmType;
+  /** Show a subtle indicator circle at this position (exam: "examine this cell") */
+  focusIndicator?: { x: number; y: number };
 }
 
 // ── Annotation builders ──
@@ -115,6 +116,18 @@ function buildThinAnnotations(cells: CellData[]): CellAnnotation[] {
       description: stageInfo.desc,
     });
     seen.add("parasitized-rbc");
+
+    // For P. falciparum gametocyte slides — add Laveran's bib annotation
+    if (stage === "gametocyte" && sp === "pf") {
+      const secondParasite = cells.find((c) => c.type === "parasitized-rbc" && c !== firstParasite);
+      if (secondParasite) {
+        annotations.push({
+          id: `c${idx++}`, x: secondParasite.x, y: secondParasite.y,
+          label: "Laveran\u2019s Bib",
+          description: "Faint arc of residual RBC membrane draped over the convex side of the gametocyte. Named after Charles Laveran (1880). The bib is a remnant of the host erythrocyte membrane that the mature gametocyte has distorted and partially escaped. Not all gametocytes show this \u2014 look for a very faint pinkish crescent hugging one side.",
+        });
+      }
+    }
   }
 
   // Max 2 WBC types
@@ -277,6 +290,7 @@ export default function SVGSlideViewer({
   showFilmToggle = true,
   examMode = false,
   initialFilmType,
+  focusIndicator,
 }: SVGSlideViewerProps) {
   const maxZoom = examMode ? MAX_ZOOM_EXAM : MAX_ZOOM_DEFAULT;
   const defaultZoom = examMode ? 1.2 : 3.5;
@@ -610,7 +624,7 @@ export default function SVGSlideViewer({
 
     // In thick film, parasites render as free structures (no host RBC)
     if (filmType === "thick" && cell.type === "parasitized-rbc") {
-      const pProps = { x: cell.x, y: cell.y, rotation: cell.rotation, seed: cell.seed, stain };
+      const pProps = { x: cell.x, y: cell.y, rotation: cell.rotation, seed: cell.seed, stain, species: cell.malariaSpecies };
       switch (cell.parasiteStage) {
         case "trophozoite": return <FreeTrophozoite key={cell.id} {...pProps} />;
         case "schizont": return <FreeSchizont key={cell.id} {...pProps} />;
@@ -726,22 +740,34 @@ export default function SVGSlideViewer({
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerLeave={onPointerUp}
-          style={{ touchAction: "none", background: filmType === "thick" ? "#e8e4d8" : stain.background }}
+          style={{ touchAction: "none", background: filmType === "thick" ? "#ede4ee" : stain.background }}
         >
           <SlideDefs stain={stain} />
-          {/* Background — mottled cream for thick, stained for thin */}
-          <rect x={-50} y={-50} width={SLIDE_W + 100} height={SLIDE_H + 100}
-            fill={filmType === "thick" ? "#e8e4d8" : stain.background}
-            filter="url(#stain-bg)" />
+
+          {/* Background with artifacts — per stain type */}
+          {stainType === "giemsa" ? (
+            <GiemsaBackground width={SLIDE_W} height={SLIDE_H} stain={stain}
+              seed={currentSlide.cells[0]?.seed ?? 777} thickFilm={filmType === "thick"} />
+          ) : (
+            <WrightGiemsaBackground width={SLIDE_W} height={SLIDE_H} stain={stain}
+              seed={currentSlide.cells[0]?.seed ?? 888} />
+          )}
+
+          {/* Cells */}
           {cells.map(renderCell)}
-          {artifacts.map(renderArtifact)}
-          <rect x={-50} y={-50} width={SLIDE_W + 100} height={SLIDE_H + 100}
-            filter="url(#scope-grain)" opacity={0.10} style={{ pointerEvents: "none" }} />
-          <rect x={-50} y={-50} width={SLIDE_W + 100} height={SLIDE_H + 100}
-            fill="url(#illumination)" style={{ pointerEvents: "none" }} />
-          <rect x={-50} y={-50} width={SLIDE_W + 100} height={SLIDE_H + 100}
-            fill="url(#vignette-grad)" style={{ pointerEvents: "none" }} />
           {annotationMarker}
+
+          {/* Focus indicator for exam — subtle "examine this" circle */}
+          {focusIndicator && (
+            <g style={{ pointerEvents: "none" }}>
+              {/* Outer ring — thin, subtle */}
+              <circle cx={focusIndicator.x} cy={focusIndicator.y} r={6}
+                fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="0.2" strokeDasharray="0.8 0.4" />
+              {/* Inner arrow pointing inward */}
+              <circle cx={focusIndicator.x} cy={focusIndicator.y} r={5}
+                fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="0.15" />
+            </g>
+          )}
         </svg>
 
         {/* ── Annotation cards — illustrated reference cards ── */}

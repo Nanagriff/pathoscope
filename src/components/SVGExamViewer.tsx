@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import type { Exam, ExamQuestion, ExamScore, Difficulty } from "@/data/exams";
 import { exams, DIFFICULTY_META } from "@/data/exams";
 import SVGSlideViewer from "./SVGSlideViewer";
+import { generateSlide } from "./microscope/generateSlide";
 
 interface Props {
   exam: Exam;
@@ -112,6 +113,27 @@ export default function SVGExamViewer({ exam }: Props) {
     answers.reduce((s, a, i) => s + (a.correct ? questions[i].points : 0), 0),
     [answers, questions],
   );
+
+  // Focus indicator for cell-specific questions
+  const focusIndicator = useMemo(() => {
+    if (!q || (q.type !== "identify-cell" && q.type !== "wbc-differential")) return undefined;
+    const slide = generateSlide({
+      width: 400, height: 300, cellSpacing: 7.6,
+      parasitemia: q.slide.parasitemia, seed: q.slide.seed,
+      smearDirection: 12, focusCenter: [0.50, 0.50], focusRadius: 350,
+      species: q.slide.species,
+      stageWeights: q.slide.stage ? { [q.slide.stage]: 1 } as Partial<Record<import("./microscope/types").ParasiteStage, number>> : undefined,
+    });
+    if (q.correctAnswer.toLowerCase().includes("platelet")) {
+      const plt = slide.cells.find((c) => c.type === "platelet");
+      if (plt) return { x: plt.x, y: plt.y };
+    }
+    const para = slide.cells.find((c) => c.type === "parasitized-rbc");
+    if (para) return { x: para.x, y: para.y };
+    const wbc = slide.cells.find((c) => ["neutrophil", "eosinophil", "basophil", "lymphocyte", "monocyte"].includes(c.type));
+    if (wbc) return { x: wbc.x, y: wbc.y };
+    return undefined;
+  }, [q]);
 
   // All exams in the same discipline for difficulty switching
   const relatedExams = exams.filter((e) => e.discipline === exam.discipline);
@@ -285,7 +307,6 @@ export default function SVGExamViewer({ exam }: Props) {
   }
 
   // ── ACTIVE ──
-  const isThickFilmQ = q.type === "identify-finding" || q.prompt.toLowerCase().includes("thick");
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Top bar */}
@@ -326,6 +347,7 @@ export default function SVGExamViewer({ exam }: Props) {
             showFilmToggle={false}
             examMode={!submitted}
             initialFilmType={q.slide.filmType}
+            focusIndicator={!submitted ? focusIndicator : undefined}
           />
         </div>
 

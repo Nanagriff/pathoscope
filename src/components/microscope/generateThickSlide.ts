@@ -81,7 +81,7 @@ export function generateThickSlide(config: SlideConfig): GeneratedSlide {
   const parasiteDesc = STAGE_DESCS[stage] ?? STAGE_DESCS.ring;
 
   // ── Free parasites — scattered across the field ──
-  const parasiteCount = Math.max(5, Math.floor(parasitemia * 800));
+  const parasiteCount = parasitemia > 0 ? Math.max(5, Math.floor(parasitemia * 800)) : 0;
 
   for (let i = 0; i < parasiteCount; i++) {
     const px = 10 + rng() * (width - 20);
@@ -147,27 +147,49 @@ export function generateThickSlide(config: SlideConfig): GeneratedSlide {
 
   cells.sort((a, b) => a.zIndex - b.zIndex);
 
-  // ── Artifacts — more debris in thick film ──
+  // ── Artifacts — thick film is VERY debris-heavy ──
   const artifacts: StainArtifact[] = [];
 
-  // Lysed cell debris — numerous small faint spots
-  for (let i = 0; i < 60; i++) {
+  // Ghost cell outlines — faint circles from lysed RBCs
+  for (let i = 0; i < 80 + Math.floor(rng() * 40); i++) {
     artifacts.push({
       x: rng() * width,
       y: rng() * height,
-      r: 0.3 + rng() * 0.8,
-      opacity: 0.04 + rng() * 0.06,
+      r: 2.5 + rng() * 1.5,
+      opacity: 0.03 + rng() * 0.04,
+      type: "bubble", // renders as circle stroke = ghost outline
+    });
+  }
+
+  // Dense stain precipitate — hundreds of tiny purple specks
+  for (let i = 0; i < 250 + Math.floor(rng() * 150); i++) {
+    artifacts.push({
+      x: rng() * width,
+      y: rng() * height,
+      r: 0.06 + rng() * 0.2,
+      opacity: 0.12 + rng() * 0.25,
+      type: "precipitate",
+    });
+  }
+
+  // Medium debris — cell fragment particles
+  for (let i = 0; i < 80 + Math.floor(rng() * 40); i++) {
+    artifacts.push({
+      x: rng() * width,
+      y: rng() * height,
+      r: 0.2 + rng() * 0.5,
+      opacity: 0.05 + rng() * 0.1,
       type: "debris",
     });
   }
 
-  // Stain precipitate
-  for (let i = 0; i < 20; i++) {
+  // Larger lysed cell remnants
+  for (let i = 0; i < 20 + Math.floor(rng() * 15); i++) {
     artifacts.push({
       x: rng() * width,
       y: rng() * height,
-      r: 0.1 + rng() * 0.2,
-      opacity: 0.15 + rng() * 0.2,
+      r: 0.5 + rng() * 1.0,
+      opacity: 0.04 + rng() * 0.06,
       type: "precipitate",
     });
   }

@@ -74,15 +74,19 @@ function CaseTab({ slideCase }: { slideCase: SlideCase }) {
       <div className="grid grid-cols-2 gap-2">
         <InfoCard label="Preparation" value={
           slideCase.sicklingConfig ? "Wet Prep (Na\u2082S\u2082O\u2085)" :
+          slideCase.discipline === "urinalysis" ? "Wet Prep (Unstained)" :
+          slideCase.discipline === "stool" ? "Wet Prep (Saline/Iodine)" :
           slideCase.svgConfig?.stainType === "giemsa" ? "Giemsa Stain" :
           "Wright-Giemsa Stain"
         } />
         <InfoCard label="Type" value={
           slideCase.sicklingConfig ? "Sickling Test" :
+          slideCase.discipline === "urinalysis" ? "Urine Sediment" :
+          slideCase.discipline === "stool" ? "Stool R/E" :
           slideCase.discipline === "malaria" ? "Thin & Thick" :
           "Blood Film"
         } />
-        <InfoCard label="Fields" value={`${slideCase.sicklingConfig?.fields.length ?? slideCase.svgConfig?.fields.length ?? slideCase.fields.length}`} />
+        <InfoCard label="Fields" value={`${slideCase.urineConfig?.fields.length ?? slideCase.sicklingConfig?.fields.length ?? slideCase.svgConfig?.fields.length ?? slideCase.fields.length}`} />
         <InfoCard label="Source" value="SVG Simulation" />
       </div>
     </div>

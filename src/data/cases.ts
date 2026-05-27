@@ -31,6 +31,29 @@ export interface SVGConfig {
   stage?: ParasiteStage;
 }
 
+/** Urine sediment config */
+export interface UrineConfig {
+  seed: number;
+  pusCells: number;
+  rbcs: number;
+  epithelial: number;
+  urothelialEpi: number;
+  tubularEpi: number;
+  calciumOxalate: number;
+  triplePhosphate: number;
+  uricAcid: number;
+  ammoniumBiurate: number;
+  amorphousCrystals: number;
+  hyalineCasts: number;
+  granularCasts: number;
+  yeast: number;
+  bacteria: number;
+  spermatozoa: number;
+  clueCells: number;
+  mucusThreads: number;
+  fields: { seed: number }[];
+}
+
 /** Sickling test slide config */
 export interface SicklingConfig {
   sicklingRate: number;
@@ -49,6 +72,8 @@ export interface SlideCase {
   fields: SlideField[];
   /** SVG-generated slide config (used when present) */
   svgConfig?: SVGConfig;
+  /** Urine sediment config */
+  urineConfig?: UrineConfig;
   /** Sickling test config */
   sicklingConfig?: SicklingConfig;
   source: string;
@@ -407,23 +432,132 @@ export const cases: SlideCase[] = [
         "annotations": []
       }
     ],
-    "svgConfig": {
-      "stainType": "wright-giemsa",
-      "parasitemia": 0,
-      "fields": [
-        { "seed": 30001 },
-        { "seed": 30002 },
-        { "seed": 30003 },
-        { "seed": 30004 },
-        { "seed": 30005 },
-        { "seed": 30006 },
-        { "seed": 30007 },
-        { "seed": 30008 },
-        { "seed": 30009 },
-        { "seed": 30010 }
-      ]
+    "urineConfig": {
+      "seed": 30001,
+      "pusCells": 180,
+      "rbcs": 50,
+      "epithelial": 20, "urothelialEpi": 5, "tubularEpi": 0,
+      "calciumOxalate": 8,
+      "triplePhosphate": 5, "uricAcid": 0, "ammoniumBiurate": 0, "amorphousCrystals": 3,
+      "hyalineCasts": 1,
+      "granularCasts": 0,
+      "yeast": 15,
+      "bacteria": 120, "spermatozoa": 8, "clueCells": 4,
+      "mucusThreads": 5,
+      "fields": [{ "seed": 30001 }, { "seed": 30002 }, { "seed": 30003 }]
     },
-    "source": "SVG-generated Wright-Giemsa thin blood film simulation",
+    "source": "SVG-generated urine sediment simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "urine-contaminated",
+    "title": "Urine Sediment \u2014 Heavy Epithelial Contamination",
+    "discipline": "urinalysis",
+    "category": "Urine R/E",
+    "clinicalHistory": "19-year-old female student at University of Ghana, Legon. Urine submitted for routine R/E as part of student health screening. Specimen collected without midstream instructions. Microscopy reveals heavy squamous epithelial cell contamination obscuring the field, with few pus cells suggesting possible contamination rather than true infection.",
+    "labData": "Urine Dipstick:\npH: 6.5\nSG: 1.015\nProtein: Negative\nGlucose: Negative\nBlood: Negative\nLE: Trace\nNitrites: Negative\n\nMicroscopy (40x HPF):\nSquamous epithelial: >20/HPF (HEAVY \u2014 contaminated specimen)\nWBCs: 3\u20135/HPF (borderline \u2014 unreliable due to contamination)\nRBCs: 0\u20131/HPF\nBacteria: Few (likely vaginal flora)\nCasts: None\nCrystals: None\n\nComment: HEAVILY CONTAMINATED SPECIMEN. Recommend repeat with proper midstream clean-catch technique.",
+    "teachingPoints": [
+      "Squamous epithelial cells are the LARGEST cells in urine sediment (40\u201360 \u00b5m) \u2014 flat, translucent, with small central dark nucleus and irregular folded edges",
+      ">5 squamous epithelial cells per HPF indicates CONTAMINATION from the vulvovaginal area (females) or distal urethra/foreskin (males) \u2014 the specimen is unreliable",
+      "In contaminated specimens, WBC and bacteria counts are unreliable because vaginal secretions contain both WBCs and normal flora bacteria",
+      "Proper midstream clean-catch technique: (1) cleanse periurethral area with water (not antiseptic), (2) void first portion into toilet, (3) collect midstream into sterile container, (4) void remainder into toilet",
+      "For female patients in Ghana, providing clear Twi/Ga/local language instructions for midstream collection significantly reduces contamination rates",
+      "Squamous cells appear very translucent under brightfield microscopy \u2014 they can be missed if the condenser is set too high. Reduce light intensity to see them clearly",
+      "Distinguish squamous from transitional epithelial cells: squamous are FLAT and LARGE with irregular edges; transitional are smaller, rounder, and originate from the bladder/ureters",
+      "A contaminated specimen should be reported as \u2018Heavily contaminated with squamous epithelial cells \u2014 recommend repeat MSU with proper collection technique\u2019",
+      "Do NOT report a culture result from a contaminated specimen as it will grow mixed vaginal flora and lead to unnecessary antibiotic treatment",
+      "Teaching point for students: ALWAYS check epithelial count FIRST before interpreting WBC and bacteria counts. If epithelials >5/HPF, the rest of the microscopy is unreliable"
+    ],
+    "fields": [],
+    "urineConfig": {
+      "seed": 30101,
+      "pusCells": 30,
+      "rbcs": 8,
+      "epithelial": 80, "urothelialEpi": 2, "tubularEpi": 0,
+      "calciumOxalate": 0,
+      "triplePhosphate": 0, "uricAcid": 0, "ammoniumBiurate": 0, "amorphousCrystals": 0,
+      "hyalineCasts": 0,
+      "granularCasts": 0,
+      "yeast": 0,
+      "bacteria": 40, "spermatozoa": 0, "clueCells": 0,
+      "mucusThreads": 8,
+      "fields": [{ "seed": 30101 }, { "seed": 30102 }, { "seed": 30103 }]
+    },
+    "source": "SVG-generated urine sediment simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "urine-crystals",
+    "title": "Urine Sediment \u2014 Calcium Oxalate Crystals",
+    "discipline": "urinalysis",
+    "category": "Urine R/E",
+    "clinicalHistory": "45-year-old male teacher from Sunyani, Bono Region. Presents with acute left flank pain radiating to the groin (renal colic). CT KUB shows a 4mm left ureteric calculus. Urine R/E requested. Microscopy reveals abundant calcium oxalate crystals in acidic urine.",
+    "labData": "Urine Dipstick:\npH: 5.5 (acidic)\nSG: 1.025 (concentrated)\nProtein: Trace\nGlucose: Negative\nBlood: 2+ (haematuria from stone)\nLE: Negative\nNitrites: Negative\n\nMicroscopy (40x HPF):\nRBCs: 25\u201340/HPF (marked haematuria)\nWBCs: 2\u20134/HPF\nCalcium oxalate crystals: ABUNDANT \u2014 octahedral \u2018envelope\u2019 shape\nEpithelial: Rare squamous\nBacteria: None\nCasts: None",
+    "teachingPoints": [
+      "Calcium oxalate crystals are the MOST COMMON crystal in urine sediment \u2014 they appear as colourless octahedral \u2018envelope\u2019 or \u2018letter X\u2019 shapes under brightfield",
+      "They are found in ACIDIC urine (pH <6.5) and are associated with oxalate-rich foods (spinach, chocolate, tea, nuts, rhubarb) and ethylene glycol poisoning",
+      "Calcium oxalate is the most common component of kidney stones worldwide \u2014 abundant crystals in a patient with renal colic strongly support the diagnosis",
+      "Two morphological forms: monohydrate (oval/dumbbell, less common) and dihydrate (octahedral envelope, most common) \u2014 the dihydrate is what we typically see",
+      "Crystals are refractile and colourless \u2014 they polarise light (birefringent), appearing bright under polarised microscopy",
+      "The envelope shape has a characteristic X pattern inside when viewed face-on \u2014 this is the most reliable identification feature",
+      "Distinguish from: uric acid crystals (rhomboid/diamond, yellow-brown), triple phosphate (coffin lid, alkaline urine), and cystine crystals (hexagonal, rare)",
+      "Haematuria (RBCs in urine) is expected with kidney stones \u2014 the stone scratches the urothelium as it passes through the ureter",
+      "In Ghana, kidney stone prevalence is increasing with urbanisation and dietary changes \u2014 reduced water intake in hot climate is a major risk factor",
+      "Report as: \u2018Calcium oxalate crystals: abundant. RBCs: 25\u201340/HPF (haematuria). Clinical correlation: consistent with urolithiasis.\u2019"
+    ],
+    "fields": [],
+    "urineConfig": {
+      "seed": 30201,
+      "pusCells": 15,
+      "rbcs": 120,
+      "epithelial": 2, "urothelialEpi": 2, "tubularEpi": 0,
+      "calciumOxalate": 40,
+      "triplePhosphate": 15, "uricAcid": 25, "ammoniumBiurate": 10, "amorphousCrystals": 5,
+      "hyalineCasts": 0,
+      "granularCasts": 0,
+      "yeast": 0,
+      "bacteria": 10, "spermatozoa": 0, "clueCells": 0,
+      "mucusThreads": 2,
+      "fields": [{ "seed": 30201 }, { "seed": 30202 }, { "seed": 30203 }]
+    },
+    "source": "SVG-generated urine sediment simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "urine-casts",
+    "title": "Urine Sediment \u2014 Granular Casts",
+    "discipline": "urinalysis",
+    "category": "Urine R/E",
+    "clinicalHistory": "58-year-old male diabetic (type 2, 12 years) from Kumasi, Ashanti Region. Presents to Komfo Anokye Teaching Hospital with progressive pedal oedema, foamy urine, and declining kidney function. Urine microscopy reveals granular casts indicating renal tubular damage.",
+    "labData": "Urine Dipstick:\npH: 6.0\nSG: 1.010 (dilute \u2014 impaired concentrating ability)\nProtein: 3+ (heavy proteinuria)\nGlucose: 2+\nBlood: 1+\nLE: Trace\nNitrites: Negative\n\nMicroscopy (40x HPF):\nGranular casts: 5\u20138/LPF (coarse and fine)\nHyaline casts: 2\u20133/LPF\nWBCs: 5\u20138/HPF\nRBCs: 3\u20135/HPF\nRenal tubular epithelial cells: Occasional\nOval fat bodies: Few\n\nSerum creatinine: 2.8 mg/dL (elevated)\neGFR: 28 mL/min (CKD stage 4)\nHbA1c: 9.2% (poorly controlled)",
+    "teachingPoints": [
+      "Granular casts are CYLINDRICAL structures formed in the renal tubules \u2014 they are moulds of the tubular lumen containing degenerated cellular material",
+      "Coarse granular casts contain large visible granules (degenerated tubular cells); fine granular casts have smaller, more uniform granules \u2014 fine represents further degradation",
+      "The presence of granular casts indicates RENAL TUBULAR PATHOLOGY \u2014 they are clinically significant and must always be reported",
+      "Casts are best seen under LOW POWER (10x) first to scan for them, then confirmed under HIGH POWER (40x) \u2014 they can be missed if you only use HPF",
+      "Hyaline casts are nearly TRANSPARENT and very easy to miss \u2014 reduce the condenser light and close the diaphragm partially to see them. They indicate non-specific renal stress",
+      "Cast progression: hyaline \u2192 granular (coarse \u2192 fine) \u2192 waxy \u2192 broad waxy \u2014 this represents increasing duration in the tubule and worsening tubular stasis",
+      "In diabetic nephropathy (this patient), casts + heavy proteinuria + declining eGFR = progressive CKD. The MLS findings guide nephrology management",
+      "Report casts per LOW POWER FIELD (LPF, 10x), not per HPF \u2014 this is the standard convention. Report type (hyaline, granular, waxy, cellular) and approximate number",
+      "Distinguish casts from mucus threads: casts have PARALLEL sides and rounded ends; mucus threads are wavy, tapered, and refractile",
+      "In Ghana, diabetic nephropathy is becoming the leading cause of CKD \u2014 early detection through urine microscopy (casts, proteinuria) enables timely referral to nephrology"
+    ],
+    "fields": [],
+    "urineConfig": {
+      "seed": 30301,
+      "pusCells": 40,
+      "rbcs": 25,
+      "epithelial": 1, "urothelialEpi": 1, "tubularEpi": 4,
+      "calciumOxalate": 0,
+      "triplePhosphate": 0, "uricAcid": 0, "ammoniumBiurate": 0, "amorphousCrystals": 0,
+      "hyalineCasts": 4,
+      "granularCasts": 8,
+      "yeast": 0,
+      "bacteria": 15, "spermatozoa": 0, "clueCells": 0,
+      "mucusThreads": 3,
+      "fields": [{ "seed": 30301 }, { "seed": 30302 }, { "seed": 30303 }]
+    },
+    "source": "SVG-generated urine sediment simulation",
     "license": "Educational use"
   },
   {
@@ -524,16 +658,17 @@ export const cases: SlideCase[] = [
     "clinicalHistory": "32-year-old female community health nurse from Navrongo, Upper East Region, seen at a follow-up visit 14 days after completing a 3-day course of artemether-lumefantrine for uncomplicated P. falciparum malaria (initial parasitemia 2.1%). She reports feeling well — no fever, headache, or body aches. Appetite has returned and she has resumed work. Physical examination: afebrile (36.5°C), no pallor, no jaundice, spleen not palpable. Day-14 blood film performed per Ghana malaria treatment monitoring protocol shows clearance of asexual parasites but persistence of gametocytes.",
     "labData": "FBC (Day 14 follow-up):\nWBC: 7.4 × 10⁹/L (normal)\nNeutrophils: 4.1 × 10⁹/L (55%)\nLymphocytes: 2.4 × 10⁹/L (32%)\n\nHb: 11.2 g/dL (improving from 10.1 at diagnosis)\nPlatelets: 268 × 10⁹/L (normalised — was 94 at diagnosis)\n\nMalaria (Day 14 film):\nRDT: Positive (Pf HRP2 — expected, antigen persists up to 4 weeks)\nAsexual parasites: NONE seen (treatment success)\nGametocytes: Present — 48/μL (low density)\nGametocyte stage: Stage V (mature, crescent/banana-shaped)\n\nDay 0 (for comparison):\nParasitemia: 2.1% (~105,000/μL)\nRDT: Positive (Pf HRP2)\nHb: 10.1 g/dL\nPlatelets: 94 × 10⁹/L",
     "teachingPoints": [
-      "The banana or crescent shape of P. falciparum gametocytes is PATHOGNOMONIC — no other human Plasmodium species produces crescent-shaped gametocytes; all others (P. vivax, P. malariae, P. ovale) have round gametocytes",
-      "Gametocytes are the sexual stage of the parasite — they are the only form infectious to the Anopheles mosquito vector. A single blood meal containing gametocytes can establish transmission",
-      "P. falciparum gametocytes take 10-14 days to mature through stages I-V in the bone marrow before being released into peripheral blood — this is why they often appear AFTER treatment has cleared the asexual stages",
-      "Gametocytes can persist in the blood for 3-6 weeks after successful ACT treatment of asexual parasites — during this window, the patient is clinically cured but remains a potential reservoir of transmission",
-      "The HRP2-based RDT remains positive for up to 4 weeks after parasite clearance because the antigen persists in the bloodstream — a positive RDT after treatment does NOT necessarily indicate treatment failure. Microscopy is needed to distinguish persistent gametocytes from recrudescence",
-      "Primaquine (single low dose of 0.25 mg/kg) is recommended by WHO as a gametocytocidal agent to reduce transmission, but it requires G6PD testing first due to risk of haemolytic anaemia — G6PD deficiency prevalence in Ghana is approximately 15-25%",
-      "Macrogametocytes (female, larger, more compact pigment, darker blue cytoplasm) and microgametocytes (male, smaller, dispersed pigment, lighter pink cytoplasm) can sometimes be distinguished on well-stained films, though this distinction is not clinically essential",
-      "Understanding gametocyte biology is critical for malaria elimination programmes in Ghana — community-level gametocyte carriage maintains transmission even when clinical cases are treated promptly",
-      "Artemisinin-based combinations clear early gametocyte stages (I-III) but are less effective against mature stage V gametocytes — this contributes to ongoing transmission in high-burden areas",
-      "In community surveillance and research settings, gametocyte density is reported per μL of blood and is used to assess transmission potential — molecular methods (QT-NASBA, RT-PCR) are more sensitive than microscopy for detecting submicroscopic gametocyte carriage"
+      "The banana or crescent shape of P. falciparum gametocytes is PATHOGNOMONIC \u2014 no other human Plasmodium species produces crescent-shaped gametocytes. P. vivax, P. malariae, and P. ovale all have ROUND gametocytes",
+      "LAVERAN\u2019S BIB: Some gametocytes show a faint arc of residual RBC membrane draped over the convex side of the crescent \u2014 named after Charles Louis Alphonse Laveran who first described malaria parasites in 1880. The bib is a remnant of the host erythrocyte membrane that the mature gametocyte has distorted and partially escaped from. It appears as a very faint pinkish crescent hugging one side of the parasite",
+      "Not all gametocytes show Laveran\u2019s bib \u2014 it is most visible in well-stained preparations where the gametocyte has nearly completely distorted the host RBC. Its presence confirms the parasite was intracellular and helps distinguish a true gametocyte from stain artefacts",
+      "Gametocytes are the SEXUAL stage \u2014 they are the only form infectious to the Anopheles mosquito vector. A single blood meal containing gametocytes can establish transmission",
+      "P. falciparum gametocytes mature through stages I\u2013V over 10\u201314 days in the bone marrow before release into peripheral blood \u2014 this is why they often appear AFTER treatment has cleared asexual stages",
+      "Gametocytes persist 3\u20136 weeks after successful ACT treatment \u2014 during this window the patient is clinically cured but remains a transmission reservoir",
+      "The HRP2-based RDT remains positive up to 4 weeks after clearance because the antigen persists in blood \u2014 a positive RDT after treatment does NOT indicate failure. Microscopy distinguishes persistent gametocytes from recrudescence",
+      "Macrogametocytes (female: larger, compact pigment, darker blue cytoplasm) vs microgametocytes (male: smaller, dispersed pigment, lighter pink cytoplasm) can sometimes be distinguished on well-stained films",
+      "Primaquine (single low dose 0.25 mg/kg) is recommended by WHO as a gametocytocidal agent \u2014 requires G6PD testing first. G6PD deficiency prevalence in Ghana is ~15\u201325%",
+      "Understanding gametocyte biology is critical for malaria elimination in Ghana \u2014 community-level gametocyte carriage maintains transmission even when clinical cases are treated promptly",
+      "Artemisinin-based combinations clear early stages (I\u2013III) but are less effective against mature stage V gametocytes \u2014 this contributes to ongoing transmission in high-burden areas"
     ],
     "fields": [],
     "svgConfig": {
@@ -603,6 +738,162 @@ export const cases: SlideCase[] = [
       "stage": "trophozoite",
       "fields": [{ "seed": 60201 }, { "seed": 60202 }, { "seed": 60203 }]
     },
+    "source": "SVG-generated Giemsa thin blood film simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "malaria-pv-schizont",
+    "title": "P. vivax \u2014 Schizonts",
+    "discipline": "malaria",
+    "category": "Plasmodium vivax",
+    "clinicalHistory": "45-year-old Indian businessman based in Kumasi, presenting with cyclical tertian fever (48-hour pattern) for 10 days. Third episode of vivax malaria in 2 years \u2014 previous episodes treated with chloroquine alone without radical cure. Now showing mature schizonts on peripheral film, indicating active schizogony. G6PD status: normal (tested previously).",
+    "labData": "FBC:\nWBC: 5.8 \u00d7 10\u2079/L\nHb: 11.2 g/dL (mild anaemia)\nPlatelets: 98 \u00d7 10\u2079/L (low)\n\nMalaria:\nRDT: Positive (pan-pLDH, Pf HRP2 negative)\nSpecies: P. vivax\nStage: Schizonts (mature) + ring forms\nParasitemia: ~2%\n\nG6PD: Normal (quantitative assay)\nReticulocytes: 4.2% (elevated)\nLDH: 380 U/L (mildly elevated)",
+    "teachingPoints": [
+      "P. vivax schizonts contain 12\u201324 merozoites arranged in a rosette or \u2018daisy\u2019 pattern around a central mass of hemozoin pigment \u2014 this is a key species differentiator",
+      "Unlike P. falciparum, P. vivax schizonts ARE normally seen in peripheral blood \u2014 ALL stages (ring, trophozoite, schizont, gametocyte) circulate in vivax infections",
+      "The host RBC is ENLARGED (1.5\u20132\u00d7 normal) with Sch\u00fcffner dots \u2014 these features persist at the schizont stage",
+      "P. vivax schizonts are LARGER than P. falciparum schizonts because the host cell is enlarged",
+      "The central hemozoin pigment in vivax schizonts is coarser and more scattered than in P. falciparum",
+      "Differentiate from P. malariae schizonts: P. malariae has only 6\u201312 merozoites in a \u2018daisy head\u2019 pattern in a normal-sized RBC",
+      "P. vivax causes cyclical TERTIAN fever (48-hour cycle) corresponding to the 48-hour erythrocytic cycle from ring to schizont rupture",
+      "Relapsing vivax: this patient\u2019s recurrent infections are due to HYPNOZOITES (dormant liver stages). Radical cure requires primaquine (14 days) after G6PD testing",
+      "In Ghana, P. vivax is rare in indigenous populations due to high Duffy-negative prevalence, but is seen in expatriates and travellers from endemic regions",
+      "Lab report should state: species (P. vivax), stages present (schizonts + rings), parasitemia, and note that all stages are seen peripherally (unlike P. falciparum)"
+    ],
+    "fields": [],
+    "svgConfig": {
+      "stainType": "giemsa",
+      "parasitemia": 0.03,
+      "species": "pv",
+      "stage": "schizont",
+      "fields": [{ "seed": 60301 }, { "seed": 60302 }, { "seed": 60303 }]
+    },
+    "source": "SVG-generated Giemsa thin blood film simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "malaria-pv-gametocyte",
+    "title": "P. vivax \u2014 Gametocytes",
+    "discipline": "malaria",
+    "category": "Plasmodium vivax",
+    "clinicalHistory": "30-year-old Sri Lankan engineer working on a road project in Tamale, presenting with 5-day fever. Blood film shows P. vivax with gametocytes \u2014 round forms filling enlarged RBCs. This is his first malaria episode. He reports no chemoprophylaxis use.",
+    "labData": "FBC:\nWBC: 6.0 \u00d7 10\u2079/L\nHb: 12.8 g/dL\nPlatelets: 110 \u00d7 10\u2079/L (low)\n\nMalaria:\nRDT: Positive (pan-pLDH)\nSpecies: P. vivax\nStage: Gametocytes (round) + ring forms + trophozoites\nParasitemia: ~2.5%\n\nG6PD: Pending (must test before radical cure)\nReticulocytes: 3.8%",
+    "teachingPoints": [
+      "P. vivax gametocytes are ROUND or OVAL \u2014 they fill most of the enlarged host RBC. This is completely different from P. falciparum\u2019s banana/crescent-shaped gametocytes",
+      "The round shape is a KEY species differentiator: if you see round gametocytes in an enlarged RBC with Sch\u00fcffner dots, it is P. vivax (or P. ovale), NOT P. falciparum",
+      "P. vivax gametocytes have a large eccentric chromatin mass and scattered hemozoin pigment throughout the cytoplasm",
+      "Gametocytes appear earlier in vivax infection than in falciparum \u2014 they may be present from the first few days of symptoms, meaning transmission can occur before the patient even seeks treatment",
+      "The host RBC remains ENLARGED with Sch\u00fcffner dots at the gametocyte stage \u2014 these RBC features persist through all vivax stages",
+      "P. vivax gametocytes and trophozoites can look similar \u2014 both are large and fill the cell. Gametocytes tend to be rounder, denser, and have a more compact chromatin mass",
+      "Distinguish from P. malariae/ovale gametocytes: P. malariae gametocytes are in normal-sized RBCs (no enlargement), and P. ovale has fimbriated/tufted RBC edges",
+      "Finding gametocytes means the patient can transmit malaria to mosquitoes \u2014 this is relevant for public health reporting",
+      "Multiple stages visible simultaneously (rings + trophozoites + gametocytes) is characteristic of P. vivax \u2014 in P. falciparum, typically only rings and gametocytes are seen peripherally",
+      "Lab report should specify ALL stages identified: \u2018P. vivax: ring forms, trophozoites, and gametocytes seen. Parasitemia ~2.5%.\u2019 Each stage provides diagnostic information"
+    ],
+    "fields": [],
+    "svgConfig": {
+      "stainType": "giemsa",
+      "parasitemia": 0.03,
+      "species": "pv",
+      "stage": "gametocyte",
+      "fields": [{ "seed": 60401 }, { "seed": 60402 }, { "seed": 60403 }]
+    },
+    "source": "SVG-generated Giemsa thin blood film simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "malaria-pm-ring",
+    "title": "P. malariae \u2014 Ring Forms",
+    "discipline": "malaria",
+    "category": "Plasmodium malariae",
+    "clinicalHistory": "55-year-old retired teacher from Bolgatanga, Upper East Region. Presents with low-grade fever recurring every 72 hours (quartan pattern) for 3 weeks. Mild splenomegaly. No recent travel. P. malariae confirmed \u2014 the only human malaria species with a 72-hour erythrocytic cycle.",
+    "labData": "FBC:\nWBC: 5.2 \u00d7 10\u2079/L\nHb: 11.8 g/dL\nPlatelets: 140 \u00d7 10\u2079/L\n\nMalaria:\nRDT: Positive (pan-pLDH, Pf HRP2 negative)\nSpecies: P. malariae\nStage: Ring forms\nParasitemia: ~0.5% (characteristically low)\n\nRenal function: Creatinine 1.4 mg/dL (monitor \u2014 P. malariae can cause nephrotic syndrome)",
+    "teachingPoints": [
+      "P. malariae ring forms resemble P. falciparum rings but tend to be THICKER and more robust \u2014 sometimes described as \u2018sturdy\u2019 rings",
+      "Host RBC is NORMAL SIZE (not enlarged) and shows NO Sch\u00fcffner dots \u2014 this distinguishes it from P. vivax/ovale",
+      "Parasitemia is characteristically LOW (<1%) even in established infections \u2014 P. malariae preferentially infects OLD RBCs which are less numerous",
+      "P. malariae has a 72-hour erythrocytic cycle causing QUARTAN fever (every 3rd day) \u2014 the only human species with this cycle. P. falciparum and P. vivax cause tertian fever (48h)",
+      "All stages are seen in peripheral blood (rings, trophozoites, schizonts, gametocytes) \u2014 similar to P. vivax but in normal-sized RBCs",
+      "P. malariae can persist as a chronic subclinical infection for DECADES \u2014 cases have been documented 40+ years after leaving endemic areas",
+      "IMPORTANT: P. malariae can cause immune-complex NEPHROTIC SYNDROME (especially in children) \u2014 monitor renal function",
+      "Differentiate from P. falciparum: P. malariae rings are thicker, parasitemia is lower, and mature stages are seen peripherally (falciparum sequesters)",
+      "In Ghana, P. malariae accounts for ~3\u20135% of malaria cases \u2014 often found as mixed infection with P. falciparum",
+      "Lab report: state species (P. malariae), note the quartan periodicity if clinical history available, and recommend renal function monitoring"
+    ],
+    "fields": [],
+    "svgConfig": { "stainType": "giemsa", "parasitemia": 0.01, "species": "pm", "stage": "ring", "fields": [{ "seed": 70101 }, { "seed": 70102 }, { "seed": 70103 }] },
+    "source": "SVG-generated Giemsa thin blood film simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "malaria-pm-trophozoite",
+    "title": "P. malariae \u2014 Band Form Trophozoites",
+    "discipline": "malaria",
+    "category": "Plasmodium malariae",
+    "clinicalHistory": "12-year-old boy from Wa, Upper West Region. Referred for investigation of proteinuria and facial oedema. Blood film reveals P. malariae trophozoites with the characteristic BAND FORM \u2014 the parasite stretches across the RBC as a transverse band. This morphology is pathognomonic for P. malariae.",
+    "labData": "FBC:\nWBC: 6.1 \u00d7 10\u2079/L\nHb: 10.4 g/dL\nPlatelets: 165 \u00d7 10\u2079/L\n\nMalaria:\nSpecies: P. malariae\nStage: Band form trophozoites\nParasitemia: ~0.3%\n\nRenal:\nUrinalysis: Protein 3+, no casts\nSerum albumin: 2.1 g/dL (low)\nCreatinine: 1.8 mg/dL (elevated)\n24h urine protein: 4.2 g (nephrotic range)",
+    "teachingPoints": [
+      "The BAND FORM is PATHOGNOMONIC for P. malariae \u2014 the trophozoite stretches across the full diameter of the RBC as a transverse bar or band of cytoplasm",
+      "No other Plasmodium species produces this band morphology \u2014 if you see a band form, it is P. malariae",
+      "The band form has a central compact chromatin mass and hemozoin pigment distributed along the band",
+      "Host RBC remains NORMAL SIZE with no Sch\u00fcffner dots \u2014 distinguishes from P. vivax trophozoites which are amoeboid in enlarged RBCs",
+      "P. malariae trophozoites can also appear as compact round forms (not just bands) \u2014 the band is the classic form but not the only morphology",
+      "This patient has P. malariae nephropathy \u2014 immune complex deposition causing nephrotic syndrome. This is a recognised complication, especially in children in endemic areas",
+      "Parasitemia is very low (0.3%) which is typical \u2014 P. malariae rarely exceeds 1% because it infects only old/senescent RBCs",
+      "P. malariae pigment (hemozoin) is coarse and dark brown \u2014 more visible than in P. falciparum ring forms",
+      "Differentiate from P. knowlesi: P. knowlesi can also show band forms but causes higher parasitemia and has a 24-hour cycle (quotidian fever)",
+      "Lab report: \u2018P. malariae identified \u2014 band form trophozoites in normal-sized RBCs. Low parasitemia (~0.3%). Recommend renal function assessment.\u2019"
+    ],
+    "fields": [],
+    "svgConfig": { "stainType": "giemsa", "parasitemia": 0.008, "species": "pm", "stage": "trophozoite", "fields": [{ "seed": 70201 }, { "seed": 70202 }, { "seed": 70203 }] },
+    "source": "SVG-generated Giemsa thin blood film simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "malaria-pm-schizont",
+    "title": "P. malariae \u2014 Schizonts (Daisy Head)",
+    "discipline": "malaria",
+    "category": "Plasmodium malariae",
+    "clinicalHistory": "68-year-old retired diplomat, previously lived in West Africa for 20 years. Now living in Accra. Presents with intermittent fever for 2 months. P. malariae schizont identified showing the classic \u2018daisy head\u2019 pattern \u2014 a small number of merozoites arranged symmetrically around central pigment.",
+    "labData": "FBC:\nWBC: 4.8 \u00d7 10\u2079/L\nHb: 11.0 g/dL\nPlatelets: 155 \u00d7 10\u2079/L\n\nMalaria:\nSpecies: P. malariae\nStage: Schizonts (daisy head) + ring forms\nParasitemia: ~0.2%",
+    "teachingPoints": [
+      "P. malariae schizonts contain only 6\u201312 merozoites (fewer than any other species) arranged symmetrically around a central pigment mass \u2014 the \u2018DAISY HEAD\u2019 or \u2018rosette\u2019 pattern",
+      "Compare: P. vivax has 12\u201324 merozoites, P. falciparum has 8\u201324 merozoites. The LOW merozoite count is a key differentiator for P. malariae",
+      "The host RBC is NORMAL SIZE \u2014 this immediately excludes P. vivax (enlarged RBC) and P. ovale (oval/fimbriated RBC)",
+      "The central pigment mass in the schizont is DARK and prominent \u2014 coarser than in other species",
+      "P. malariae schizonts ARE seen in peripheral blood (unlike P. falciparum where schizonts indicate severe disease)",
+      "This patient\u2019s chronic low-grade infection spanning months is typical \u2014 P. malariae can persist as a chronic infection for decades without causing severe symptoms",
+      "The very low parasitemia (0.2%) is characteristic \u2014 may require extended scanning to find parasites",
+      "P. malariae is the least common of the four classic human malaria species in Ghana but should always be considered in chronic/relapsing fever",
+      "Differentiate the daisy head from P. vivax rosettes: P. malariae has FEWER, more evenly spaced merozoites in a NORMAL-sized RBC",
+      "Lab report: document the daisy head pattern as it is morphologically distinctive and confirms P. malariae"
+    ],
+    "fields": [],
+    "svgConfig": { "stainType": "giemsa", "parasitemia": 0.005, "species": "pm", "stage": "schizont", "fields": [{ "seed": 70301 }, { "seed": 70302 }, { "seed": 70303 }] },
+    "source": "SVG-generated Giemsa thin blood film simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "malaria-po-ring",
+    "title": "P. ovale \u2014 Ring Forms",
+    "discipline": "malaria",
+    "category": "Plasmodium ovale",
+    "clinicalHistory": "35-year-old Ghanaian NGO worker returned from Liberia 3 months ago. Presents with relapsing tertian fever. Blood film shows ring forms in OVAL-shaped RBCs with FIMBRIATED (tufted/ragged) edges \u2014 pathognomonic for P. ovale. Sch\u00fcffner dots also visible.",
+    "labData": "FBC:\nWBC: 5.5 \u00d7 10\u2079/L\nHb: 12.0 g/dL\nPlatelets: 120 \u00d7 10\u2079/L\n\nMalaria:\nRDT: Positive (pan-pLDH)\nSpecies: P. ovale\nStage: Ring forms\nParasitemia: ~1%\n\nG6PD: Normal",
+    "teachingPoints": [
+      "P. ovale-infected RBCs are OVAL-SHAPED with FIMBRIATED (ragged/tufted) edges \u2014 this is PATHOGNOMONIC. No other species distorts the RBC into an oval shape",
+      "The host RBC is slightly ENLARGED (1.25\u00d7 normal) \u2014 less enlargement than P. vivax but clearly bigger than normal",
+      "Sch\u00fcffner dots (James\u2019 dots in P. ovale) are present \u2014 fine pink stippling similar to P. vivax",
+      "Ring forms resemble P. vivax rings \u2014 larger and thicker than P. falciparum. The RBC shape (oval + fimbriated) is the KEY differentiator from vivax",
+      "P. ovale has a tertian cycle (48 hours) like P. vivax and P. falciparum",
+      "Like P. vivax, P. ovale has HYPNOZOITES (dormant liver stages) causing relapses months to years later. This patient\u2019s relapse 3 months post-travel is typical",
+      "Radical cure requires primaquine (same as P. vivax) \u2014 G6PD testing is mandatory before prescribing",
+      "P. ovale is most common in WEST AFRICA \u2014 Ghana, Nigeria, Liberia. It is the species most likely to be misidentified as P. vivax",
+      "Parasitemia is typically low (usually <2%) \u2014 P. ovale rarely causes severe disease",
+      "Lab report: emphasise the oval RBC shape and fimbriated edges \u2014 these features distinguish P. ovale from all other species"
+    ],
+    "fields": [],
+    "svgConfig": { "stainType": "giemsa", "parasitemia": 0.015, "species": "po", "stage": "ring", "fields": [{ "seed": 70401 }, { "seed": 70402 }, { "seed": 70403 }] },
     "source": "SVG-generated Giemsa thin blood film simulation",
     "license": "Educational use"
   },

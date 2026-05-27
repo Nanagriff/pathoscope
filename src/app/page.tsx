@@ -8,7 +8,9 @@ import LandingDemo from "@/components/LandingDemo";
 /* ── Data ── */
 const malariaCases = cases.filter((c) => c.discipline === "malaria");
 const wbcCases = cases.filter((c) => c.discipline === "hematology" && c.category === "Normal WBC");
-const rbcCases = cases.filter((c) => c.discipline === "hematology" && c.category !== "Normal WBC");
+const rbcCases = cases.filter((c) => c.discipline === "hematology" && c.category !== "Normal WBC" && c.category !== "Sickling Test");
+const sicklingCases = cases.filter((c) => c.category === "Sickling Test");
+const urineCases = cases.filter((c) => c.discipline === "urinalysis");
 const totalQuestions = exams.reduce((s, e) => s + e.questionBank.length, 0);
 const demoCase = malariaCases[0];
 

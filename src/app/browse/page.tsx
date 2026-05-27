@@ -218,7 +218,7 @@ function SlideCard({ c }: { c: (typeof cases)[number] }) {
           </span>
         )}
         <h3 className="text-xs sm:text-sm font-semibold leading-snug text-gray-200 group-hover:text-white transition-colors line-clamp-2">{c.title}</h3>
-        <p className="text-[10px] sm:text-[11px] text-gray-500 mt-1 font-[family-name:var(--font-geist-mono)]">{c.svgConfig?.fields.length ?? c.fields.length} fields</p>
+        <p className="text-[10px] sm:text-[11px] text-gray-500 mt-1 font-[family-name:var(--font-geist-mono)]">{c.urineConfig?.fields.length ?? c.sicklingConfig?.fields.length ?? c.svgConfig?.fields.length ?? c.fields.length} fields</p>
       </div>
     </Link>
   );

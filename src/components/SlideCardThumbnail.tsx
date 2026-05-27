@@ -1,6 +1,8 @@
 /**
  * Realistic glass microscope slide thumbnail for card previews.
- * Shows a glass rectangle with frosted label end, thin smear, and thick smear drop.
+ * Two modes:
+ * - Blood film: thin smear + thick drop
+ * - Wet prep: single coverslip over a drop (sickling, urinalysis, stool)
  */
 
 interface Props {
@@ -11,21 +13,22 @@ interface Props {
   title?: string;
 }
 
-export default function SlideCardThumbnail({ stage, species, discipline, title }: Props) {
+export default function SlideCardThumbnail({ stage, species, discipline, title, category }: Props) {
   const isMalaria = discipline === "malaria";
-  // Thin smear colour based on stain
+  const isWetPrep = category === "Sickling Test" || discipline === "urinalysis" || discipline === "stool";
+
   const thinColor = isMalaria ? "#d8c8d4" : "#e0c4c0";
   const thickColor = isMalaria ? "#3a1020" : "#4a1818";
-  // Label text
+  const wetDropColor = category === "Sickling Test" ? "#a8b098" : discipline === "urinalysis" ? "#e8d890" : "#b0a070";
+
   const labelText = stage
-    ? `${(species === "pv" ? "Pv" : species === "pm" ? "Pm" : species === "po" ? "Po" : "Pf")} ${stage.slice(0, 4)}.`
-    : title?.slice(0, 8) ?? "";
+    ? `${(species === "pv" ? "Pv" : species === "pm" ? "Pm" : species === "po" ? "Po" : species === "pf" ? "Pf" : "")} ${stage.slice(0, 4)}.`
+    : isWetPrep ? "W.P." : title?.slice(0, 8) ?? "";
 
   return (
     <div className="w-full h-24 sm:h-28 flex items-center justify-center mb-3 rounded-lg"
       style={{ background: "linear-gradient(135deg, #2a2640 0%, #1a1830 100%)" }}>
       <svg viewBox="0 0 200 68" className="w-[85%] h-auto drop-shadow-lg">
-        {/* Glass slide body */}
         <defs>
           <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#f0eff4" />
@@ -51,42 +54,46 @@ export default function SlideCardThumbnail({ stage, species, discipline, title }
         {/* Frosted label end */}
         <rect x={2} y={3} width={42} height={56} rx={1} fill="#e4e0ec" opacity={0.8} />
         <rect x={2} y={3} width={42} height={56} rx={1} fill="none" stroke="#d0ccd8" strokeWidth={0.3} />
-        {/* Label text */}
-        <text x={23} y={28} textAnchor="middle" fontSize={6} fill="#6058708"
+        <text x={23} y={28} textAnchor="middle" fontSize={6} fill="#605870"
           fontFamily="system-ui" fontWeight="600" opacity={0.6}>
           {labelText.toUpperCase()}
         </text>
-        {/* Pencil-written ID line */}
         <line x1={8} y1={38} x2={38} y2={38} stroke="#8880a0" strokeWidth={0.3} opacity={0.4} />
         <line x1={8} y1={43} x2={30} y2={43} stroke="#8880a0" strokeWidth={0.3} opacity={0.3} />
 
-        {/* ── Thin smear — feathered pale smear in the middle ── */}
-        <ellipse cx={95} cy={31} rx={42} ry={20}
-          fill={thinColor} opacity={0.35} />
-        <ellipse cx={90} cy={31} rx={35} ry={16}
-          fill={thinColor} opacity={0.25} />
-        {/* Feathered edge — thinner toward right */}
-        <ellipse cx={110} cy={31} rx={18} ry={12}
-          fill={thinColor} opacity={0.15} />
+        {isWetPrep ? (
+          <>
+            {/* ── Wet Prep: drop under a coverslip ── */}
+            {/* Drop of fluid */}
+            <ellipse cx={120} cy={31} rx={28} ry={22}
+              fill={wetDropColor} opacity={0.3} />
+            <ellipse cx={118} cy={30} rx={22} ry={17}
+              fill={wetDropColor} opacity={0.2} />
+            {/* Coverslip — square glass on top */}
+            <rect x={95} y={10} width={48} height={42} rx={1}
+              fill="rgba(200,210,220,0.15)" stroke="#b8b4c4" strokeWidth={0.4} />
+            {/* Coverslip reflection */}
+            <line x1={98} y1={13} x2={138} y2={13} stroke="#ffffff" strokeWidth={0.3} opacity={0.3} />
+            {/* Label */}
+            <text x={120} y={58} textAnchor="middle" fontSize={4} fill="#908898" fontFamily="system-ui" opacity={0.5}>
+              Wet Prep
+            </text>
+          </>
+        ) : (
+          <>
+            {/* ── Blood Film: thin smear + thick drop ── */}
+            <ellipse cx={95} cy={31} rx={42} ry={20} fill={thinColor} opacity={0.35} />
+            <ellipse cx={90} cy={31} rx={35} ry={16} fill={thinColor} opacity={0.25} />
+            <ellipse cx={110} cy={31} rx={18} ry={12} fill={thinColor} opacity={0.15} />
 
-        {/* ── Thick smear — dark circular drop ── */}
-        <ellipse cx={160} cy={31} rx={16} ry={16}
-          fill={thickColor} opacity={0.85} />
-        {/* Slight edge variation */}
-        <ellipse cx={160} cy={31} rx={14} ry={14}
-          fill={thickColor} opacity={0.4} />
-        {/* Highlight on the drop */}
-        <ellipse cx={156} cy={26} rx={4} ry={3}
-          fill="#ffffff" opacity={0.08} />
+            <ellipse cx={160} cy={31} rx={16} ry={16} fill={thickColor} opacity={0.85} />
+            <ellipse cx={160} cy={31} rx={14} ry={14} fill={thickColor} opacity={0.4} />
+            <ellipse cx={156} cy={26} rx={4} ry={3} fill="#ffffff" opacity={0.08} />
 
-        {/* Thin label */}
-        <text x={95} y={55} textAnchor="middle" fontSize={4.5} fill="#908898" fontFamily="system-ui" opacity={0.5}>
-          Thin
-        </text>
-        {/* Thick label */}
-        <text x={160} y={55} textAnchor="middle" fontSize={4.5} fill="#908898" fontFamily="system-ui" opacity={0.5}>
-          Thick
-        </text>
+            <text x={95} y={55} textAnchor="middle" fontSize={4.5} fill="#908898" fontFamily="system-ui" opacity={0.5}>Thin</text>
+            <text x={160} y={55} textAnchor="middle" fontSize={4.5} fill="#908898" fontFamily="system-ui" opacity={0.5}>Thick</text>
+          </>
+        )}
       </svg>
     </div>
   );

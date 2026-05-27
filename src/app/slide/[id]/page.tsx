@@ -4,6 +4,7 @@ import { cases, disciplines } from "@/data/cases";
 import SlideViewer from "@/components/SlideViewer";
 import SVGSlideViewer from "@/components/SVGSlideViewer";
 import SicklingViewer from "@/components/SicklingViewer";
+import UrineViewer from "@/components/UrineViewer";
 import SlideSidebar from "@/components/SlideSidebar";
 import MobileSidebarToggle from "@/components/MobileSidebarToggle";
 import SlideOnboarding from "@/components/SlideOnboarding";
@@ -27,12 +28,13 @@ export default async function SlidePage({
   const disc = disciplines.find((d) => d.id === slideCase.discipline);
   const svg = slideCase.svgConfig;
   const sickling = slideCase.sicklingConfig;
+  const urine = slideCase.urineConfig;
 
   return (
     <div className="flex flex-col h-dvh overflow-hidden">
       {/* Top bar */}
       <header className="flex items-center gap-3 px-3 py-2.5 bg-gray-900 border-b border-gray-700 shrink-0">
-        <Link href="/" className="text-gray-300 hover:text-white transition-colors text-sm shrink-0">
+        <Link href="/browse" className="text-gray-300 hover:text-white transition-colors text-sm shrink-0">
           &larr;
         </Link>
         <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -50,7 +52,9 @@ export default async function SlidePage({
       <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Viewer */}
         <div className="flex-1 min-w-0 min-h-0 relative">
-          {sickling ? (
+          {urine ? (
+            <UrineViewer config={urine} fields={urine.fields} />
+          ) : sickling ? (
             <SicklingViewer
               sicklingRate={sickling.sicklingRate}
               fields={sickling.fields}
