@@ -152,58 +152,61 @@ export const GIEMSA: StainProfile = {
 export const WRIGHT_GIEMSA: StainProfile = {
   id: "wright-giemsa",
 
-  background: "#fdf8f6",
+  // Warm pale pink background — characteristic PBS appearance
+  background: "#fef6f2",
 
-  // Brighter pink/salmon RBCs
+  // Warm pink/salmon RBCs with clear white central pallor
   rbcGradients: [
-    ["#fef4f0", "#f6d0c6", "#e8a8a0", "#d88880", "#cc7878"],
-    ["#fef2ee", "#f4ccc2", "#e6a498", "#d48478", "#c87474"],
-    ["#fcf0ec", "#f0c8be", "#e0a098", "#d08078", "#c47070"],
-    ["#faecea", "#eec4ba", "#dc9c94", "#cc7c74", "#c06c6c"],
-    ["#fef8f4", "#f8dcd4", "#ecb8b0", "#dc9c94", "#d08888"],
-    ["#fef6f2", "#f6d8d0", "#eab4ac", "#d89890", "#cc8484"],
-    ["#fefaf6", "#fae4dc", "#f0c8c0", "#e0a8a0", "#d49494"],
-    ["#f8eae4", "#e8beb4", "#d49088", "#c47470", "#b86464"],
+    ["#fef4f0", "#f4ccc0", "#e4a498", "#d08478", "#c47070"],
+    ["#fef2ee", "#f2c8bc", "#e2a090", "#cc8070", "#c06c6c"],
+    ["#fcf0ea", "#f0c4b8", "#de9c90", "#c87c6c", "#bc6868"],
+    ["#faecea", "#eec0b4", "#da988c", "#c47868", "#b86464"],
+    ["#fef6f2", "#f6d4ca", "#e8b0a4", "#d89890", "#cc8484"],
+    ["#fef4f0", "#f4d0c6", "#e6aca0", "#d4948c", "#c88080"],
+    ["#fef8f4", "#f8dcd2", "#eec4b8", "#dca49c", "#d09090"],
+    ["#f8e8e2", "#e6bab0", "#d08c84", "#c07068", "#b46060"],
   ],
 
   parasitizedRbcGradient:
-    ["#fef2ee", "#f2d8ce", "#e0b0a4", "#cc9088", "#c48080"],
+    ["#fef2ee", "#f0d4c8", "#dea89c", "#c88c84", "#c07c7c"],
 
+  // Very clear white central pallor — prominent donut shape
   pallorStops: [
-    "rgba(254,248,244,0.85)",
-    "rgba(244,216,206,0.42)",
-    "rgba(228,184,168,0.14)",
-    "rgba(216,168,152,0)",
+    "rgba(255,252,248,0.90)",
+    "rgba(248,228,218,0.45)",
+    "rgba(236,200,186,0.15)",
+    "rgba(224,184,170,0)",
   ],
 
-  // Wright-Giemsa: parasite ring is more purple (mixed dyes), chromatin red-purple
   parasiteRingStroke: "#5a2890",
   parasiteRingFill: "rgba(90,40,160,0.06)",
   parasiteDiffusion: "rgba(80,30,130,0.04)",
   chromatinPrimary: "#8a1050",
   chromatinSecondary: "#a01860",
 
-  nucleusFill: "#100838",          // very dark purple
-  nucleusParachromatin: "#200e58",
-  nucleusDenseChromatin: "#080420",
+  // Dark purple nuclei — correct
+  nucleusFill: "#1a0c48",
+  nucleusParachromatin: "#2c1868",
+  nucleusDenseChromatin: "#0c0630",
 
-  neutrophilCyto: ["#a878c4", "#9058ac"],  // deep purple
-  neutrophilGranule: "#7040a8",
+  // WBC cytoplasm — pale pink to pale lavender (NOT deep purple)
+  neutrophilCyto: ["#e0cce0", "#ccb4cc"],  // pale pink-lavender
+  neutrophilGranule: "#8868a8",             // purple granules
 
-  eosinophilCyto: ["#b080c4", "#9860ac"],  // deep purple
-  eosinophilGranule: [200, 55, 115],
+  eosinophilCyto: ["#e8d0d8", "#d8b8c8"],  // pale pink
+  eosinophilGranule: [210, 70, 110],        // pink-orange granules
 
-  lymphocyteCyto: ["#a070bc", "#8858a8"],  // deep purple rim
+  lymphocyteCyto: ["#d4c0e0", "#c0a8cc"],  // pale blue-lavender rim
 
-  monocyteCyto: ["#a878bc", "#9060a8"],  // deep purple
+  monocyteCyto: ["#dccce0", "#c8b4cc"],    // pale blue-grey
 
-  basophilCyto: ["#a878b8", "#9060a8"],
-  basophilGranule: "#180a48",
+  basophilCyto: ["#d8c8d8", "#c4b4c4"],
+  basophilGranule: "#201060",
 
-  plateletOuter: "#d8d0e4",
-  plateletInner: "#8068a8",
+  plateletOuter: "#d8c8dc",
+  plateletInner: "#7858a0",
 
-  membraneStroke: "#b88880",
+  membraneStroke: "#c09088",               // warm pink membrane
   precipitateColour: "#3a1860",
 };
 

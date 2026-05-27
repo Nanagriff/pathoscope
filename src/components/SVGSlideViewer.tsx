@@ -604,11 +604,11 @@ export default function SVGSlideViewer({
 
   return (
     <div className="relative flex flex-col h-full overflow-hidden">
-      {/* ── Toolbar — compact, single row ── */}
-      <div className="flex items-center gap-1.5 px-2 py-1.5 bg-gray-900/95 border-b border-gray-800 shrink-0 z-20">
+      {/* ── Toolbar ── */}
+      <div className="flex items-center gap-1.5 px-2 py-2 sm:py-1.5 bg-gray-900 border-b border-gray-700 shrink-0 z-20">
         {/* Field nav */}
         <button onClick={handlePrevField} disabled={currentField === 0 || transitioning}
-          className="w-7 h-7 flex items-center justify-center rounded bg-gray-800 hover:bg-gray-700 text-xs font-bold transition-colors disabled:opacity-30">&larr;</button>
+          className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded bg-gray-800 hover:bg-gray-700 text-sm sm:text-xs font-bold transition-colors disabled:opacity-30">&larr;</button>
         <div className="flex items-center gap-1 px-1">
           {fieldConfigs.map((_, i) => (
             <button key={i} onClick={() => changeField(i)} disabled={transitioning}
@@ -616,16 +616,16 @@ export default function SVGSlideViewer({
           ))}
         </div>
         <button onClick={handleNextField} disabled={currentField === fieldConfigs.length - 1 || transitioning}
-          className="w-7 h-7 flex items-center justify-center rounded bg-gray-800 hover:bg-gray-700 text-xs font-bold transition-colors disabled:opacity-30">&rarr;</button>
-        <span className="text-[10px] text-gray-500 hidden sm:inline">{currentField + 1}/{fieldConfigs.length}</span>
+          className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded bg-gray-800 hover:bg-gray-700 text-sm sm:text-xs font-bold transition-colors disabled:opacity-30">&rarr;</button>
+        <span className="text-[10px] text-gray-400 hidden sm:inline">{currentField + 1}/{fieldConfigs.length}</span>
 
         <div className="w-px h-5 bg-gray-700 mx-0.5" />
 
         {/* Zoom */}
-        <button onClick={handleZoomIn} className="w-7 h-7 flex items-center justify-center rounded bg-gray-800 hover:bg-gray-700 text-xs font-bold">+</button>
-        <button onClick={handleZoomOut} className="w-7 h-7 flex items-center justify-center rounded bg-gray-800 hover:bg-gray-700 text-xs font-bold">&minus;</button>
+        <button onClick={handleZoomIn} className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded bg-gray-800 hover:bg-gray-700 text-sm sm:text-xs font-bold">+</button>
+        <button onClick={handleZoomOut} className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded bg-gray-800 hover:bg-gray-700 text-sm sm:text-xs font-bold">&minus;</button>
         <button onClick={handleHome} className="px-2 h-7 rounded bg-gray-800 hover:bg-gray-700 text-[10px] font-medium hidden sm:flex items-center">Home</button>
-        <span className="text-[10px] text-gray-500 tabular-nums">{zoom.toFixed(1)}x</span>
+        <span className="text-[10px] text-gray-300 tabular-nums">{zoom.toFixed(1)}x</span>
 
         <div className="flex-1" />
 
