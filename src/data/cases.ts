@@ -31,6 +31,12 @@ export interface SVGConfig {
   stage?: ParasiteStage;
 }
 
+/** Sickling test slide config */
+export interface SicklingConfig {
+  sicklingRate: number;
+  fields: { seed: number; sicklingRate?: number }[];
+}
+
 export interface SlideCase {
   id: string;
   title: string;
@@ -43,6 +49,8 @@ export interface SlideCase {
   fields: SlideField[];
   /** SVG-generated slide config (used when present) */
   svgConfig?: SVGConfig;
+  /** Sickling test config */
+  sicklingConfig?: SicklingConfig;
   source: string;
   license: string;
 }
@@ -339,61 +347,6 @@ export const cases: SlideCase[] = [
     "license": "Educational use"
   },
   {
-    "id": "heme-sickle",
-    "title": "Sickle Cell Disease — Blood Film",
-    "discipline": "hematology",
-    "category": "RBC abnormalities",
-    "clinicalHistory": "19-year-old male student from Cape Coast, Central Region, known HbSS sickle cell disease (diagnosed at newborn screening), presenting to Cape Coast Teaching Hospital with sudden onset of severe bilateral thigh and lower back pain for 18 hours, not relieved by oral tramadol. Reports mild fever and dark urine. He had a similar crisis 3 months ago triggered by a respiratory infection. Currently on hydroxyurea 15 mg/kg/day and folic acid 5 mg daily. Last transfusion: 4 months ago. Physical examination: distressed, febrile (39.2°C), HR 112, jaundiced sclerae, tender bilateral femora, spleen not palpable (likely auto-infarcted). No signs of acute chest syndrome.",
-    "labData": "FBC:\nWBC: 18.4 × 10⁹/L (elevated — baseline for SCD ~12-15)\nNeutrophils: 12.9 × 10⁹/L (70%)\nLymphocytes: 3.7 × 10⁹/L (20%)\nMonocytes: 1.5 × 10⁹/L (8%)\n\nHb: 6.2 g/dL (below patient's steady-state of 7.8)\nMCV: 92 fL (elevated on hydroxyurea)\nReticulocytes: 18% (elevated — active haemolysis)\nPlatelets: 480 × 10⁹/L\n\nHaemolysis markers:\nTotal bilirubin: 4.8 mg/dL (elevated, mostly indirect)\nLDH: 620 U/L (elevated)\nHaptoglobin: <10 mg/dL (undetectable)\n\nHb electrophoresis (previous): HbS 82%, HbF 12%, HbA2 3.5%, HbA 0%\nBlood film: Sickle cells, target cells, polychromasia, Howell-Jolly bodies, nucleated RBCs\n\nBlood group: O Rh(D) positive\nAntibody screen: Negative\nCross-match: 2 units requested",
-    "teachingPoints": [
-      "Sickle cells (drepanocytes) are elongated, crescent-shaped or holly-leaf-shaped RBCs resulting from polymerisation of deoxygenated HbS — they are the pathognomonic finding on the blood film",
-      "Target cells (codocytes) show a central dark area surrounded by a pale ring and dark outer rim — common in haemoglobinopathies, thalassaemia, liver disease, and post-splenectomy states",
-      "Polychromasia (bluish-grey larger RBCs on Wright-Giemsa stain) indicates reticulocytes — reflecting compensatory erythropoiesis in response to chronic haemolysis",
-      "Howell-Jolly bodies (small dark-purple nuclear remnants in RBCs) indicate functional hyposplenism or asplenia — in SCD, repeated splenic infarction leads to auto-splenectomy usually by age 5",
-      "Nucleated red blood cells (NRBCs) may be seen in severe crises, indicating extreme erythropoietic stress — the marrow is releasing immature red cell precursors",
-      "Ghana has one of the highest SCD burdens globally: approximately 2% of newborns have HbSS, and ~25-30% of the population carries the HbAS (sickle cell trait). The national newborn screening programme is critical for early diagnosis",
-      "Hydroxyurea increases HbF production, which inhibits HbS polymerisation — it reduces crisis frequency, acute chest syndrome, and transfusion requirements. It is now standard of care in Ghana's SCD clinics",
-      "Differential diagnosis of acute pain crisis: vaso-occlusive crisis (most common), acute chest syndrome (fever + new infiltrate + respiratory symptoms), osteomyelitis (Salmonella is a characteristic organism in SCD), and splenic sequestration (in younger children before auto-splenectomy)",
-      "Transfusion considerations: SCD patients are at high risk of alloimmunisation — extended phenotype matching (Rh C, c, E, e and Kell) is recommended. In Ghana, limited availability of phenotyped blood remains a challenge",
-      "Distinguish from HbSC disease: patients with HbSC often have milder anaemia, more prominent target cells, and characteristic HbC crystals on the blood film — Hb electrophoresis is essential for definitive diagnosis"
-    ],
-    "fields": [
-      {
-        "dziPath": "/slides/heme-sickle-001/heme-sickle-001.dzi",
-        "annotations": []
-      },
-      {
-        "dziPath": "/slides/heme-sickle-002/heme-sickle-002.dzi",
-        "annotations": []
-      },
-      {
-        "dziPath": "/slides/heme-sickle-003/heme-sickle-003.dzi",
-        "annotations": []
-      },
-      {
-        "dziPath": "/slides/heme-sickle-004/heme-sickle-004.dzi",
-        "annotations": []
-      },
-      {
-        "dziPath": "/slides/heme-sickle-005/heme-sickle-005.dzi",
-        "annotations": []
-      }
-    ],
-    "svgConfig": {
-      "stainType": "wright-giemsa",
-      "parasitemia": 0,
-      "fields": [
-        { "seed": 20601 },
-        { "seed": 20602 },
-        { "seed": 20603 },
-        { "seed": 20604 },
-        { "seed": 20605 }
-      ]
-    },
-    "source": "SVG-generated Wright-Giemsa thin blood film simulation",
-    "license": "Educational use"
-  },
-  {
     "id": "urine-mixed-findings",
     "title": "Urine Sediment — Mixed Findings",
     "discipline": "urinalysis",
@@ -651,6 +604,164 @@ export const cases: SlideCase[] = [
       "fields": [{ "seed": 60201 }, { "seed": 60202 }, { "seed": 60203 }]
     },
     "source": "SVG-generated Giemsa thin blood film simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "sickling-negative-hbaa",
+    "title": "Sickling Test \u2014 Negative (HbAA)",
+    "discipline": "hematology",
+    "category": "Sickling Test",
+    "clinicalHistory": "Pre-operative sickling screening. 25-year-old male scheduled for elective hernia repair at Korle Bu Teaching Hospital. No personal or family history of sickle cell disease. Haemoglobin electrophoresis pending. Sodium metabisulphite (2%) sickling test performed as rapid screen.",
+    "labData": "Sickling Test:\nReducing agent: 2% sodium metabisulphite (Na\u2082S\u2082O\u2085)\nReading time: 30 minutes\nResult: NEGATIVE \u2014 no sickling observed\n\nInterpretation: No HbS detected.\nConsistent with HbAA (normal).\n\nFBC:\nHb: 14.2 g/dL\nMCV: 88 fL\nMCH: 30 pg\nRDW: 12.8%\nHb electrophoresis: HbA 97%, HbA\u2082 2.8%, HbF 0.2%",
+    "teachingPoints": [
+      "GENETICS: Sickle cell disease is caused by a single nucleotide mutation (GAG\u2192GTG) in the \u03b2-globin gene on chromosome 11p15.5, producing a glutamic acid\u2192valine substitution at position 6 of the \u03b2-globin chain (HbS: \u03b26Glu\u2192Val). This replaces a charged, hydrophilic residue with a hydrophobic valine on the surface of the haemoglobin tetramer \u2014 the molecular root of all sickle cell pathology.",
+      "MOLECULAR MECHANISM: When HbS is deoxygenated (T-state), the \u03b26 valine inserts into a complementary hydrophobic pocket (formed by Phe85 and Leu88) on the \u03b21 chain of an adjacent HbS tetramer. This intermolecular contact nucleates the polymerisation of HbS into long, rigid, multi-stranded fibres called tactoids. These fibres mechanically distort the RBC membrane into the sickle shape. HbA lacks the \u03b26 valine and therefore CANNOT participate in this polymerisation \u2014 which is why this test is negative.",
+      "WHY Na\u2082S\u2082O\u2085 WORKS: Sodium metabisulphite is a strong reducing agent that scavenges dissolved oxygen from the wet preparation, forcing haemoglobin into the deoxygenated T-state. In this conformation, the \u03b26 valine becomes exposed and accessible for polymer contacts. In vivo, this same deoxygenation occurs naturally in capillary beds, the spleen, and any hypoxic tissue. Because this patient has HbAA, no amount of deoxygenation produces polymerisation \u2014 the critical valine is simply absent.",
+      "NEGATIVE RESULT: All RBCs remain as normal biconcave discs with smooth contours and central pallor throughout the observation period (30 minutes and 24 hours). No crescents, holly-leaf, elongated, or oat-shaped forms are seen. The cells may appear slightly olive-green/grey rather than pink because this is an unstained wet preparation viewed under reduced light.",
+      "PROCEDURE: (1) Place 1 drop of fresh EDTA-anticoagulated blood on a clean glass slide, (2) add 1 drop of freshly prepared 2% Na\u2082S\u2082O\u2085 solution, (3) mix gently with a wooden applicator stick, (4) cover with a clean coverslip, (5) seal ALL four edges completely with petroleum jelly or clear nail varnish to create an airtight seal preventing re-oxygenation, (6) incubate at room temperature, (7) examine under 40x objective at 30 minutes and again at 24 hours.",
+      "QUALITY CONTROL: A known positive control (HbAS or HbSS blood) and a known negative control (HbAA blood) MUST be run with every batch of tests. The Na\u2082S\u2082O\u2085 reagent must be prepared fresh daily because it oxidises rapidly on exposure to air and loses its reducing capacity. A negative result without a demonstrated working positive control is technically INVALID and must be repeated.",
+      "FALSE NEGATIVES: A negative sickling test can be falsely reassuring in several scenarios: (1) expired or degraded reagent that has lost reducing potency, (2) inadequate coverslip sealing allowing atmospheric oxygen to enter and prevent deoxygenation, (3) reading too early before sufficient deoxygenation has occurred, (4) recent blood transfusion diluting HbS below the detection threshold, (5) infants under 6 months whose high HbF (\u03b12\u03b32) inhibits HbS polymerisation by not co-polymerising with HbS fibres, (6) very low HbS concentrations in some compound heterozygotes.",
+      "LIMITATION \u2014 CANNOT DISTINGUISH TRAIT FROM DISEASE: The sickling test is a qualitative screening test that detects the presence or absence of HbS. It CANNOT differentiate HbAS (sickle cell trait, ~40% HbS) from HbSS (sickle cell disease, ~80-90% HbS), nor can it identify compound heterozygotes like HbSC or HbS\u03b2-thalassaemia. Haemoglobin electrophoresis (cellulose acetate at pH 8.6, citrate agar at pH 6.2) or HPLC is required for definitive genotype diagnosis.",
+      "REVERSIBILITY: In patients who DO carry HbS, early sickling is reversible \u2014 re-oxygenation breaks the HbS polymer fibres and cells return to their normal biconcave shape. However, repeated cycles of sickling and unsickling progressively damage the RBC membrane skeleton (spectrin-actin network), producing irreversibly sickled cells (ISCs) that remain deformed even when fully oxygenated. In HbAA individuals, this process never occurs because polymerisation cannot initiate.",
+      "GHANA CONTEXT: Ghana has one of the highest sickle cell burdens in West Africa \u2014 approximately 25% of the population carries the HbAS trait and roughly 2% of all newborns are born with SCD (HbSS, HbSC, or HbS\u03b2-thal). Sickling test is a mandatory pre-operative screening test in most Ghanaian hospitals. The National Newborn Screening Programme, launched in 2010 at selected sites, uses isoelectric focusing or HPLC for early detection, but the sickling test remains a widely used point-of-care tool in district hospitals and clinics.",
+      "WHAT A NEGATIVE RESULT EXCLUDES AND DOES NOT EXCLUDE: A negative sickling test excludes HbS-containing genotypes (HbAS, HbSS, HbSC, HbS\u03b2-thal) but does NOT exclude other clinically important haemoglobinopathies. HbCC disease, HbC trait, HbD, HbE, \u03b1-thalassaemia, and \u03b2-thalassaemia trait will all give negative sickling tests. Therefore, a negative sickling test should not be interpreted as 'no haemoglobinopathy' \u2014 it means only 'no HbS detected.'",
+      "CLINICAL SIGNIFICANCE FOR THIS PATIENT: With confirmed HbAA genotype, this patient can safely undergo surgery under general anaesthesia without sickle cell precautions. There is no risk of perioperative sickling crisis, no need for pre-operative exchange transfusion, and no requirement for specific oxygenation protocols related to SCD. However, standard pre-operative haematological assessment (FBC, coagulation screen) remains necessary."
+    ],
+    "fields": [],
+    "sicklingConfig": {
+      "sicklingRate": 0,
+      "fields": [{ "seed": 40001 }, { "seed": 40002 }, { "seed": 40003 }]
+    },
+    "source": "SVG-generated sickling test simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "sickling-crescent",
+    "title": "Sickling Test \u2014 Crescent / Drepanocyte",
+    "discipline": "hematology",
+    "category": "Sickling Test",
+    "clinicalHistory": "Pre-marital screening. 22-year-old female, Komfo Anokye Teaching Hospital, Kumasi. Partner is known HbAS. Sickling test positive \u2014 predominantly crescent (sickle) forms observed. Electrophoresis pending.",
+    "labData": "Sickling Test:\nReducing agent: 2% Na\u2082S\u2082O\u2085\nReading: 30 minutes\nResult: POSITIVE\nPredominant form: Crescent/sickle (drepanocyte)\nSickling rate: ~40%\n\nWet preparation \u2014 unstained",
+    "teachingPoints": [
+      "GENETICS: The crescent/drepanocyte is the hallmark morphology of sickle cell and arises from a single nucleotide mutation (GAG\u2192GTG) in the \u03b2-globin gene on chromosome 11p15.5, causing a glutamic acid\u2192valine substitution at position 6 (HbS: \u03b26Glu\u2192Val). This seemingly minor amino acid change \u2014 replacing a charged, hydrophilic surface residue with a hydrophobic one \u2014 is sufficient to cause catastrophic polymerisation under deoxygenation.",
+      "MOLECULAR MECHANISM: In the deoxygenated T-state, the \u03b26 valine on one HbS tetramer docks into a hydrophobic acceptor pocket (Phe85/Leu88) on an adjacent HbS \u03b21 chain. This lateral contact propagates into long, rigid, multi-stranded polymer fibres (tactoids) that align parallel to the long axis of the RBC. The mechanical force of these growing fibres pushes against the lipid bilayer and spectrin-actin cytoskeleton, stretching the cell into the classic crescent/sickle shape with pointed ends.",
+      "CRESCENT (DREPANOCYTE) MORPHOLOGY: The crescent or drepanocyte is the most commonly recognised and most frequently encountered sickle form. It presents as an elongated, curved cell with two distinctly pointed ends, resembling a crescent moon. The cell body appears uniformly dense due to HbS polymer fibres spanning the full length of the cell. This shape reflects complete or near-complete intracellular polymerisation with fibres oriented along a single axis.",
+      "WHY Na\u2082S\u2082O\u2085 WORKS: Sodium metabisulphite is a potent reducing agent that rapidly consumes dissolved O\u2082 in the sealed preparation, shifting haemoglobin into the deoxy-T conformation. This exposes the \u03b26 valine for intermolecular contact and triggers polymerisation. In vivo, the same process occurs in the microcirculation where pO\u2082 drops below 40 mmHg \u2014 particularly in the spleen, renal medulla, and retina. The sealed coverslip prevents atmospheric oxygen from re-entering, sustaining the deoxygenated environment.",
+      "PROCEDURE: (1) Place 1 drop of fresh EDTA blood on a clean glass slide, (2) add 1 drop of freshly prepared 2% Na\u2082S\u2082O\u2085, (3) mix gently, (4) apply coverslip, (5) seal ALL edges with petroleum jelly or clear nail varnish to create an airtight chamber, (6) incubate at room temperature, (7) examine under 40x at 30 minutes and again at 24 hours. Cells appear olive-green/grey in this unstained wet preparation, not the pink of Romanowsky-stained films.",
+      "REVERSIBILITY: Early crescent formation is reversible \u2014 if oxygen is reintroduced (e.g., a seal breaks), the HbS polymers disassemble and the cell returns to its normal biconcave shape within minutes. However, with each sickling-unsickling cycle, the membrane cytoskeleton sustains cumulative damage: loss of membrane lipid, oxidative cross-linking of spectrin, and calcium influx activating the Gardos channel. After sufficient damage, the cell becomes an irreversibly sickled cell (ISC) that retains the deformed shape permanently regardless of oxygenation.",
+      "QUALITY CONTROL: A known positive control (HbAS or HbSS blood) and a known negative control (HbAA blood) must be run with every batch. The Na\u2082S\u2082O\u2085 reagent must be prepared fresh daily \u2014 it auto-oxidises to sodium sulphate on air exposure and rapidly loses reducing capacity. A positive result without a working negative control, or vice versa, renders the batch unreliable.",
+      "LIMITATION \u2014 TRAIT vs DISEASE: The sickling test CANNOT distinguish HbAS (trait, ~35-40% HbS) from HbSS (disease, ~80-90% HbS). Both genotypes produce crescents under reducing conditions. Nor can it identify HbSC or HbS\u03b2-thalassaemia compound heterozygotes. Definitive diagnosis requires haemoglobin electrophoresis (cellulose acetate pH 8.6, citrate agar pH 6.2) or HPLC. This distinction is clinically critical because HbAS carriers are generally asymptomatic while HbSS patients have severe, life-threatening disease.",
+      "GHANA CONTEXT: Approximately 25% of the Ghanaian population carries HbAS trait, and roughly 2% of newborns are born with sickle cell disease. When both partners are HbAS (as in this pre-marital screening scenario), each pregnancy carries a 25% chance of an HbSS child, 50% chance of HbAS, and 25% chance of HbAA. Pre-marital and pre-conception screening with haemoglobin electrophoresis is now strongly promoted by the Ghana Health Service and the National Newborn Screening Programme.",
+      "WHY CRESCENTS PREDOMINATE: The crescent is the most common sickle morphology because it reflects the most energetically favourable polymer alignment \u2014 a single dominant fibre bundle running the length of the cell, bending the membrane symmetrically. Other forms (holly-leaf, elongated, oat) represent different degrees of polymerisation, different numbers of independent fibre domains, or different stages of the time-dependent sickling process.",
+      "THIS FINDING REQUIRES URGENT FOLLOW-UP: A positive sickling test showing crescents demands immediate haemoglobin electrophoresis or HPLC to determine the exact genotype. In this pre-marital context, both partners' genotypes must be established before reproductive counselling can proceed. If both are confirmed HbAS, genetic counselling should include discussion of prenatal diagnosis options, the natural history of SCD, and the availability of comprehensive care programmes in Ghana."
+    ],
+    "fields": [],
+    "sicklingConfig": { "sicklingRate": 0.4, "fields": [{ "seed": 40101 }, { "seed": 40102 }, { "seed": 40103 }] },
+    "source": "SVG-generated sickling test simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "sickling-holly-leaf",
+    "title": "Sickling Test \u2014 Holly Leaf Cells",
+    "discipline": "hematology",
+    "category": "Sickling Test",
+    "clinicalHistory": "Newborn screening follow-up. 8-month-old infant, Princess Marie Louise Children\u2019s Hospital, Accra. Initial screening showed HbFS pattern. Sickling test at 8 months shows holly-leaf variant cells under reducing agent.",
+    "labData": "Sickling Test:\nReducing agent: 2% Na\u2082S\u2082O\u2085\nReading: 30 minutes\nResult: POSITIVE\nPredominant form: Holly leaf (irregular spiky)\nSickling rate: ~35%\n\nWet preparation \u2014 unstained\nHb electrophoresis: HbS 78%, HbF 18%, HbA\u2082 3%",
+    "teachingPoints": [
+      "GENETICS: This infant carries the HbFS pattern, meaning they are homozygous for the sickle mutation (GAG\u2192GTG) in the \u03b2-globin gene on chromosome 11p15.5, producing \u03b26Glu\u2192Val (HbS). The 'F' represents foetal haemoglobin (HbF, \u03b12\u03b32), which is still present at significant levels at 8 months of age. By 6-12 months, HbF gradually declines as the \u03b3-globin genes are silenced and \u03b2-globin expression predominates, allowing HbS to rise and clinical disease to manifest.",
+      "MOLECULAR MECHANISM: When deoxygenated, the \u03b26 valine on HbS fits into the hydrophobic pocket (Phe85/Leu88) on the \u03b21 chain of an adjacent HbS tetramer, nucleating polymer fibre formation. However, HbF (\u03b12\u03b32) CANNOT co-polymerise with HbS because the \u03b3-globin chain lacks the complementary hydrophobic acceptor pocket. HbF tetramers act as polymer chain terminators \u2014 when incorporated into a growing fibre, they block further elongation. This is why higher HbF levels produce partial, irregular polymerisation rather than complete, aligned fibre bundles.",
+      "HOLLY LEAF MORPHOLOGY: The holly leaf cell has multiple irregular spiky projections radiating outward from the cell body in different directions, resembling a holly leaf. Unlike the crescent (which has a single dominant polymer axis), the holly leaf reflects MULTIPLE short, independently nucleated polymer domains growing in different directions within the same cell. Each domain distorts the membrane locally, producing the characteristic multi-pointed, irregular silhouette.",
+      "WHY HOLLY LEAF IN THIS INFANT: At 8 months with HbF 18%, there is enough HbF to partially inhibit polymerisation but not enough to prevent it entirely. The HbF tetramers interspersed among HbS tetramers terminate polymer growth prematurely, preventing the formation of long, aligned fibre bundles. The result is multiple short polymer segments growing in different orientations, producing the irregular holly-leaf distortion rather than a clean crescent. This same morphology is seen in older patients on hydroxyurea therapy, which pharmacologically reactivates HbF production.",
+      "WHY Na\u2082S\u2082O\u2085 WORKS: Sodium metabisulphite consumes dissolved oxygen in the sealed preparation, forcing haemoglobin into the deoxy-T state where the \u03b26 valine becomes exposed and available for polymerisation. In vivo, this deoxygenation occurs naturally in capillary beds (pO\u2082 < 40 mmHg), which is why even infants with residual HbF can begin to experience vaso-occlusive events as HbF levels decline during the first year of life.",
+      "PROCEDURE: (1) Place 1 drop fresh EDTA blood on a clean slide, (2) add 1 drop freshly prepared 2% Na\u2082S\u2082O\u2085, (3) mix gently, (4) cover with coverslip, (5) seal ALL edges with petroleum jelly or nail varnish to prevent air entry and re-oxygenation, (6) incubate at room temperature, (7) examine under 40x at 30 minutes and again at 24 hours. Cells appear olive-green/grey in this unstained wet preparation.",
+      "QUALITY CONTROL: Known positive (HbAS or HbSS) and known negative (HbAA) controls must be run with every batch. Na\u2082S\u2082O\u2085 must be freshly prepared daily as it auto-oxidises to inactive sodium sulphate on air exposure. In infants under 6 months, the sickling test may be FALSE NEGATIVE due to high HbF levels inhibiting detectable polymerisation \u2014 this is why neonatal diagnosis relies on electrophoresis or HPLC, not the sickling test.",
+      "LIMITATION \u2014 TRAIT vs DISEASE: The sickling test cannot distinguish HbAS from HbSS, HbSC, or HbS\u03b2-thalassaemia. This infant's HbFS pattern on electrophoresis (HbS 78%, HbF 18%) confirms HbSS disease. By contrast, an HbAS infant at this age would show approximately HbA 55-60%, HbS 30-35%, HbF 5-10%. Electrophoresis or HPLC provides the definitive genotype.",
+      "GHANA CONTEXT: Ghana's National Newborn Screening Programme (NNSP), launched at selected sites including Korle Bu, Komfo Anokye, and Tamale Teaching Hospitals, uses isoelectric focusing (IEF) or HPLC on dried blood spots collected at birth. This infant was identified at birth with an HbFS pattern. Approximately 2% of Ghanaian newborns are born with SCD. Early identification before 3 months enables enrolment in comprehensive care programmes, which have reduced under-5 mortality from SCD by over 70% in screened populations.",
+      "REVERSIBILITY AND IRREVERSIBILITY: At this early age and HbF level, most holly-leaf sickling is still REVERSIBLE \u2014 re-oxygenation dissociates the short polymer segments and cells return to normal shape. As HbF declines over the coming months, sickling episodes will become more severe with longer polymer fibres, and the cumulative membrane damage from repeated sickling-unsickling cycles will eventually produce irreversibly sickled cells (ISCs) with permanently damaged spectrin-actin cytoskeletons.",
+      "CLINICAL MANAGEMENT FOR THIS INFANT: Confirmed HbSS at 8 months requires: (1) daily oral penicillin V prophylaxis (125 mg twice daily, increasing to 250 mg at age 3) to prevent fatal pneumococcal sepsis, (2) completed pneumococcal conjugate vaccine series plus 23-valent polysaccharide booster, (3) folic acid supplementation, (4) parental education on splenic sequestration crisis recognition (sudden pallor, abdominal distension, lethargy), (5) fever management protocol (\u226538.5\u00b0C = immediate hospital assessment), and (6) consideration of hydroxyurea initiation from age 9-12 months per recent WHO and NHLBI guidelines.",
+      "HOLLY LEAF CELLS IN THE BROADER SICKLING SPECTRUM: Holly leaf forms often coexist with crescents and elongated forms in the same preparation. The specific morphology a given cell assumes depends on its individual HbS:HbF ratio, the local polymer nucleation kinetics, and the degree of deoxygenation achieved at that point in the incubation. As incubation progresses to 24 hours and deoxygenation becomes more complete, some holly-leaf cells may convert to crescents as polymer domains merge and align."
+    ],
+    "fields": [],
+    "sicklingConfig": { "sicklingRate": 0.35, "fields": [{ "seed": 40201 }, { "seed": 40202 }, { "seed": 40203 }] },
+    "source": "SVG-generated sickling test simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "sickling-elongated",
+    "title": "Sickling Test \u2014 Elongated / Boat Cells",
+    "discipline": "hematology",
+    "category": "Sickling Test",
+    "clinicalHistory": "Employment medical. 30-year-old male applying for mining job in Tarkwa, Western Region. Employer requires sickling test. Patient reports no symptoms. Sickling test shows elongated/boat-shaped cells.",
+    "labData": "Sickling Test:\nReducing agent: 2% Na\u2082S\u2082O\u2085\nReading: 30 minutes\nResult: POSITIVE\nPredominant form: Elongated/boat cells\nSickling rate: ~30%\n\nWet preparation \u2014 unstained\nHb electrophoresis: PENDING",
+    "teachingPoints": [
+      "GENETICS: Sickle cell disease originates from a single nucleotide mutation (GAG\u2192GTG) in the \u03b2-globin gene on chromosome 11p15.5, resulting in a glutamic acid\u2192valine substitution at position 6 (HbS: \u03b26Glu\u2192Val). This substitution places a hydrophobic valine residue on the surface of the haemoglobin molecule where a charged, hydrophilic glutamate normally sits \u2014 this seemingly small change is the root cause of the entire sickling phenomenon observed in this test.",
+      "MOLECULAR MECHANISM: In the deoxygenated T-state, the exposed \u03b26 valine on one HbS tetramer engages a complementary hydrophobic pocket (Phe85/Leu88) on the \u03b21 chain of a neighbouring HbS tetramer. This nucleates polymer formation. The elongated/boat shape represents the EARLIEST stage of this polymerisation process \u2014 a small number of short polymer fibres have begun to form but have not yet grown long enough or aligned sufficiently to produce the full crescent distortion. The cell is being stretched along one axis but retains some of its original width.",
+      "ELONGATED/BOAT MORPHOLOGY: The elongated or boat-shaped cell is stretched into a widened oval with blunted (not sharply pointed) ends, resembling a canoe or boat. It is distinctly wider than a crescent and lacks pointed tips. This shape reflects early polymerisation where HbS fibres are beginning to align along the long axis of the cell but polymer density is insufficient to fully compress the cell into a thin crescent. It represents a transient, intermediate state in the time-dependent sickling process.",
+      "TIME-DEPENDENT PROGRESSION: Sickling is a kinetic process. The delay time for polymer nucleation depends on HbS concentration, degree of deoxygenation, temperature, pH, and 2,3-DPG levels. At the 30-minute reading, elongated/boat cells predominate because polymerisation is still in its early phase. By 24 hours, further deoxygenation and continued polymer growth typically convert many elongated cells into full crescents as fibres lengthen, align, and compress the cell further. This time-course is why reading at BOTH 30 minutes and 24 hours is essential.",
+      "WHY Na\u2082S\u2082O\u2085 WORKS: Sodium metabisulphite is a reducing agent that scavenges dissolved oxygen from the sealed preparation, driving haemoglobin into the deoxy-T conformation. This conformational change exposes the \u03b26 valine for intermolecular contact and initiates polymerisation. The rate of deoxygenation by Na\u2082S\u2082O\u2085 is gradual, which is why early readings often show intermediate forms (elongated/boat) rather than fully formed crescents. In vivo, rapid deoxygenation in capillary beds can produce faster sickling.",
+      "PROCEDURE: (1) Place 1 drop fresh EDTA blood on a clean slide, (2) add 1 drop of freshly prepared 2% Na\u2082S\u2082O\u2085 (prepare fresh daily \u2014 the reagent auto-oxidises to inactive sodium sulphate on air exposure and loses reducing capacity within hours), (3) mix gently, (4) apply coverslip, (5) seal ALL four edges with petroleum jelly or clear nail varnish, (6) incubate at room temperature, (7) examine under 40x at 30 minutes and again at 24 hours. Cells appear olive-green/grey in this unstained wet preparation.",
+      "QUALITY CONTROL: Known positive (HbAS or HbSS) and known negative (HbAA) controls must accompany every test batch. Fresh reagent preparation is especially critical for detecting early-stage sickling \u2014 degraded Na\u2082S\u2082O\u2085 produces insufficient deoxygenation and may fail to generate even elongated forms, leading to false negatives.",
+      "LIMITATION \u2014 TRAIT vs DISEASE: The sickling test cannot differentiate HbAS (trait, generally asymptomatic) from HbSS (disease, severe clinical phenotype), HbSC, or HbS\u03b2-thalassaemia. Both HbAS and HbSS blood will produce elongated cells and crescents under reducing conditions. Haemoglobin electrophoresis or HPLC is mandatory for definitive genotyping. This distinction is especially important in an employment context where HbAS carriers can work without restriction while HbSS individuals may require specific occupational health accommodations.",
+      "DISTINGUISHING FROM ARTEFACT: Elongated/boat cells must be differentiated from artefactually stretched or distorted cells caused by excessive spreading pressure during preparation, fibrin strands, or drying artefacts. True sickled elongated cells show consistent morphology across multiple cells in the field, have smooth membranes, and are distributed randomly rather than aligned in the direction of a smear. Artefactual distortion typically shows irregular edges, inconsistent shapes, and directional alignment.",
+      "GHANA CONTEXT: Employment-related sickling screening is common in Ghana, particularly for physically demanding occupations such as mining (Tarkwa, Obuasi), military service, and offshore oil and gas work. Approximately 25% of the Ghanaian population carries HbAS trait. A positive sickling test does NOT disqualify from employment \u2014 HbAS carriers can work normally with adequate hydration. However, HbSS individuals may need workplace accommodations including guaranteed access to oral fluids, avoidance of prolonged high-altitude or low-oxygen environments, and temperature-controlled rest areas. The Minerals Commission and Ghana Armed Forces both require pre-employment haemoglobin genotype testing.",
+      "REVERSIBILITY: Elongated/boat cells represent early, fully REVERSIBLE sickling. If the seal is broken and oxygen re-enters the preparation, these cells will return to their normal biconcave shape within minutes as the short polymer fibres disassemble. This reversibility underscores why proper sealing technique is critical \u2014 any air leak during incubation will reverse the sickling process and produce a false-negative result. In vivo, HbAS carriers experience transient sickling only under extreme conditions (severe dehydration, high altitude, strenuous exercise), while HbSS patients sickle at physiological oxygen tensions.",
+      "THIS PATIENT REQUIRES DEFINITIVE GENOTYPING: The presence of elongated cells confirms HbS is present, but the critical question for employment clearance is whether this patient is HbAS (trait \u2014 medically fit for mining work) or HbSS (disease \u2014 requires occupational health assessment and possible workplace modifications). Urgent haemoglobin electrophoresis or HPLC must be completed before any employment decision is finalised."
+    ],
+    "fields": [],
+    "sicklingConfig": { "sicklingRate": 0.3, "fields": [{ "seed": 40301 }, { "seed": 40302 }, { "seed": 40303 }] },
+    "source": "SVG-generated sickling test simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "sickling-oat",
+    "title": "Sickling Test \u2014 Oat / Filament Cells (Severe)",
+    "discipline": "hematology",
+    "category": "Sickling Test",
+    "clinicalHistory": "Emergency admission. 16-year-old female, known HbSS, Tamale Teaching Hospital. Vaso-occlusive crisis with acute chest syndrome. Sickling test performed on admission shows oat/filament cells indicating severe irreversible sickling.",
+    "labData": "Sickling Test:\nReducing agent: 2% Na\u2082S\u2082O\u2085\nReading: 30 minutes\nResult: STRONGLY POSITIVE\nPredominant form: Oat/filament cells (irreversible)\nSickling rate: ~65%\n\nWet preparation \u2014 unstained\nHb electrophoresis (known): HbS 82%, HbF 10%, HbA 0%\n\nFBC:\nHb: 5.8 g/dL (crisis level)\nReticulocytes: 22%",
+    "teachingPoints": [
+      "GENETICS: This patient is homozygous for the sickle mutation (GAG\u2192GTG) in the \u03b2-globin gene on chromosome 11p15.5, producing HbS (\u03b26Glu\u2192Val) at 82% of total haemoglobin. The \u03b26 valine \u2014 a hydrophobic residue placed on the surface where a hydrophilic glutamate normally sits \u2014 is responsible for all the polymerisation, membrane damage, and vaso-occlusion that defines this disease. With only 10% HbF and 0% HbA, there is minimal inhibition of polymer formation.",
+      "MOLECULAR MECHANISM \u2014 WHY OAT/FILAMENT CELLS FORM: The oat/filament shape represents the most extreme degree of HbS polymerisation. In the deoxygenated T-state, \u03b26 valine docks into the hydrophobic pocket (Phe85/Leu88) on adjacent HbS \u03b21 chains, nucleating polymer fibres. In oat cells, these polymer bundles are maximally dense and tightly aligned along a single axis, compressing the cell into a very thin, rigid filament. The polymer fibres are so densely packed that they completely dominate the cell's internal architecture, leaving virtually no space for free haemoglobin solution.",
+      "OAT/FILAMENT MORPHOLOGY: The oat cell is extremely thin, elongated, and filamentous \u2014 narrower than a crescent and often appearing as a thread-like structure with tapered ends. In the unstained wet preparation, oat cells appear as thin olive-green filaments that are distinctly thinner than crescents. The extreme thinness reflects maximum polymer packing \u2014 the more complete the polymerisation, the more rigid and compressed the cell becomes. This is the morphological endpoint of the sickling spectrum: normal disc \u2192 elongated/boat \u2192 crescent \u2192 oat/filament.",
+      "IRREVERSIBLY SICKLED CELLS (ISCs): Oat/filament cells are frequently irreversibly sickled cells (ISCs) \u2014 they maintain their deformed shape even when fully re-oxygenated because the RBC membrane has been permanently damaged. The mechanism of irreversibility involves: (1) oxidative cross-linking and aggregation of spectrin in the membrane skeleton, (2) loss of membrane phospholipid asymmetry with phosphatidylserine exposure on the outer leaflet, (3) persistent calcium influx through the Gardos channel (calcium-activated potassium channel) causing cellular dehydration, and (4) loss of membrane surface area through vesiculation. These cumulative insults from repeated sickling-unsickling cycles render the cytoskeleton rigid and non-deformable.",
+      "WHY Na\u2082S\u2082O\u2085 WORKS: Sodium metabisulphite scavenges dissolved O\u2082 from the sealed preparation, forcing HbS into the deoxy-T state where the \u03b26 valine becomes exposed for polymerisation. However, in severe HbSS disease like this case, ISCs are already present in the native blood BEFORE the reducing agent is added \u2014 they can be seen on a standard Wright-Giemsa peripheral blood film without any deoxygenation. The Na\u2082S\u2082O\u2085 merely increases the proportion of sickled cells by inducing reversible sickling in those cells that are not yet irreversibly damaged.",
+      "PROCEDURE: (1) Place 1 drop fresh EDTA blood on a clean slide, (2) add 1 drop freshly prepared 2% Na\u2082S\u2082O\u2085, (3) mix gently, (4) coverslip, (5) seal ALL edges with petroleum jelly, (6) incubate at room temperature, (7) read under 40x at 30 minutes and 24 hours. With HbSS and 82% HbS, sickling is rapid and extensive \u2014 the 30-minute reading already shows a sickling rate of ~65%, which is much higher than typically seen in HbAS trait at the same time point.",
+      "QUALITY CONTROL: Known positive and negative controls must accompany every test. However, in an emergency admission like this, the clinical picture (known HbSS, vaso-occlusive crisis, Hb 5.8 g/dL) is already diagnostic \u2014 the sickling test serves to confirm and document rather than to screen. Na\u2082S\u2082O\u2085 must still be freshly prepared for valid results.",
+      "PROGNOSTIC SIGNIFICANCE: A high proportion of oat/filament cells and ISCs on the sickling test or peripheral film correlates with: (1) more frequent vaso-occlusive crises, (2) higher baseline haemolysis (elevated LDH, indirect bilirubin, reticulocytes), (3) progressive organ damage (renal, splenic, hepatic), and (4) overall disease severity. ISC percentage is used as a marker of chronic disease burden and can be tracked to monitor response to disease-modifying therapy such as hydroxyurea.",
+      "LIMITATION \u2014 TRAIT vs DISEASE: While the heavy sickling rate in this case strongly suggests HbSS rather than HbAS, the sickling test formally cannot make this distinction. However, the combination of a sickling rate >50% at 30 minutes, visible ISCs, and the clinical context (known HbSS, recurrent crises) makes the genotype clinically obvious. Electrophoresis confirms: HbS 82%, HbF 10%, HbA 0%.",
+      "CLINICAL CONTEXT \u2014 ACUTE CHEST SYNDROME: This patient is in the most dangerous acute complication of SCD. Acute chest syndrome (ACS) is defined by a new pulmonary infiltrate on chest X-ray with at least one of: fever, cough, chest pain, tachypnoea, or hypoxia. It is caused by a combination of pulmonary vaso-occlusion by sickled cells, fat embolism from bone marrow infarction, and secondary infection. Management requires: supplemental O\u2082 to maintain SpO\u2082 >95% (reducing further sickling), exchange transfusion to reduce HbS percentage below 30% and raise Hb to 10 g/dL, empiric broad-spectrum antibiotics (including atypical coverage), bronchodilators, incentive spirometry, and adequate analgesia.",
+      "GHANA CONTEXT AND MANAGEMENT: SCD affects approximately 2% of Ghanaian newborns (~15,000/year). Hydroxyurea is the cornerstone disease-modifying therapy \u2014 it increases HbF production by reactivating \u03b3-globin gene expression, which inhibits HbS polymerisation (HbF tetramers terminate polymer fibres). Over months, hydroxyurea reduces ISC proportion, decreases crisis frequency by 40-50%, and lowers mortality. The Ghana National SCD Registry tracks clinical outcomes and promotes hydroxyurea uptake. Chronic transfusion programmes (targeting HbS <30%) are available at major teaching hospitals (Korle Bu, KATH, TTH) for patients with recurrent ACS, stroke, or severe phenotype.",
+      "REVERSIBILITY SPECTRUM: Unlike crescents and elongated cells, which are generally reversible with re-oxygenation, true oat/filament ISCs are PERMANENTLY deformed. Their membranes cannot return to normal because the spectrin cytoskeleton is irreversibly cross-linked and the cell has lost critical membrane components. These cells are removed from circulation by the spleen (and liver in autosplenectomised patients) and have a markedly shortened lifespan of 6-12 days (vs. normal 120 days). The chronic haemolysis of ISCs contributes to the baseline anaemia, jaundice, and cholelithiasis seen in SCD."
+    ],
+    "fields": [],
+    "sicklingConfig": { "sicklingRate": 0.65, "fields": [{ "seed": 40401 }, { "seed": 40402 }, { "seed": 40403 }] },
+    "source": "SVG-generated sickling test simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "sickling-mixed",
+    "title": "Sickling Test \u2014 Mixed Variants",
+    "discipline": "hematology",
+    "category": "Sickling Test",
+    "clinicalHistory": "Antenatal booking. 28-year-old pregnant woman (12 weeks), Ridge Hospital, Accra. Routine sickling test shows mixed sickle cell variants \u2014 crescents, holly-leaf, and elongated forms all visible.",
+    "labData": "Sickling Test:\nReducing agent: 2% Na\u2082S\u2082O\u2085\nReading: 30 minutes\nResult: POSITIVE\nForms: Mixed \u2014 crescents, holly-leaf, elongated\nSickling rate: ~45%\n\nWet preparation \u2014 unstained\nHb electrophoresis: URGENT \u2014 requested\n\nAntenatal FBC:\nHb: 10.2 g/dL\nMCV: 78 fL",
+    "teachingPoints": [
+      "GENETICS: The sickle mutation is a single nucleotide change (GAG\u2192GTG) in the \u03b2-globin gene on chromosome 11p15.5, resulting in a glutamic acid\u2192valine substitution at position 6 (HbS: \u03b26Glu\u2192Val). This places a hydrophobic valine on the molecular surface where a charged, hydrophilic glutamate normally resides. Inheritance is autosomal recessive: HbAS carriers (one mutant allele) are generally asymptomatic, while HbSS homozygotes (two mutant alleles) have severe disease. This patient's genotype is pending \u2014 the mixed morphology alone cannot determine it.",
+      "MOLECULAR MECHANISM: When HbS is deoxygenated (T-state), the \u03b26 valine on one HbS tetramer inserts into a hydrophobic acceptor pocket (Phe85/Leu88) on the \u03b21 chain of an adjacent tetramer. This nucleates the formation of long, rigid, multi-stranded polymer fibres (tactoids) that distort the RBC membrane. The DEGREE and PATTERN of polymerisation within each individual cell determines its specific morphology \u2014 which is why multiple sickle forms coexist in the same preparation.",
+      "WHY MULTIPLE FORMS COEXIST: Not all RBCs in a blood sample have identical HbS concentration, identical MCHC, or identical HbF content. Cells with higher HbS concentration and lower HbF polymerise more rapidly and completely, forming crescents or oat cells. Cells with relatively more HbF (which terminates polymer fibres by failing to co-polymerise) produce holly-leaf forms with multiple short, irregularly oriented polymer domains. Cells just beginning to polymerise show elongated/boat shapes. Additionally, 2,3-DPG concentration, intracellular pH, and hydration state vary between individual RBCs, all of which influence the nucleation delay time and extent of polymer growth.",
+      "WHY Na\u2082S\u2082O\u2085 WORKS: Sodium metabisulphite is a reducing agent that scavenges dissolved oxygen from the sealed preparation, progressively shifting haemoglobin from the oxy-R state to the deoxy-T state. The T-state exposes the \u03b26 valine for intermolecular contact. Because deoxygenation progresses gradually across the preparation, cells at different locations and with different HbS concentrations reach the polymerisation threshold at different times, contributing to the morphological heterogeneity. In vivo, this same variability occurs as blood traverses microvascular beds with varying pO\u2082 levels.",
+      "PROCEDURE: (1) Place 1 drop fresh EDTA blood on a clean slide, (2) add 1 drop freshly prepared 2% Na\u2082S\u2082O\u2085, (3) mix gently, (4) apply coverslip, (5) seal ALL four edges with petroleum jelly or nail varnish, (6) incubate at room temperature, (7) examine under 40x at 30 minutes and again at 24 hours. Cells appear olive-green/grey in this unstained wet preparation. Mixed forms at 30 minutes actually CONFIRM the test is functioning correctly \u2014 a preparation showing only a single morphology would be unusual and might suggest artefact.",
+      "QUALITY CONTROL: Known positive (HbAS or HbSS) and known negative (HbAA) controls must accompany every batch. Na\u2082S\u2082O\u2085 must be freshly prepared daily. A negative result without a working positive control is invalid. For antenatal screening, the clinical consequences of a false negative (missing SCD in a pregnant woman) are severe, making QC compliance essential.",
+      "LIMITATION \u2014 TRAIT vs DISEASE: The sickling test cannot distinguish HbAS (trait, ~35-40% HbS) from HbSS (disease, ~80-90% HbS), HbSC (compound heterozygote), or HbS\u03b2-thalassaemia. All of these genotypes will produce positive sickling tests with mixed morphologies. Haemoglobin electrophoresis or HPLC is mandatory for definitive genotyping. In the antenatal setting, this distinction is URGENT because it determines whether the pregnancy is managed as high-risk (HbSS/HbSC) or routine with genetic counselling (HbAS).",
+      "REVERSIBILITY: At the 30-minute reading, most sickled cells in a mixed preparation are still REVERSIBLE \u2014 breaking the seal and allowing re-oxygenation will cause the polymer fibres to disassemble and cells to return to normal biconcave shape. At the 24-hour reading, more complete deoxygenation produces a shift in the morphological spectrum toward crescents and oat forms. Repeated in vivo sickling-unsickling cycles gradually damage the membrane cytoskeleton (spectrin cross-linking, lipid loss, calcium influx), eventually producing irreversibly sickled cells (ISCs).",
+      "GHANA CONTEXT \u2014 ANTENATAL SCREENING: Sickling test is part of Ghana's routine antenatal care package alongside haemoglobin estimation, blood group and Rh typing, and screening for HIV, hepatitis B, and syphilis. With approximately 25% of the population carrying HbAS and ~2% of newborns born with SCD, antenatal screening identifies at-risk pregnancies and enables genetic counselling. The partner's sickling status and electrophoresis result must also be obtained. If both partners are HbAS, each pregnancy carries a 25% probability of HbSS, 50% HbAS, and 25% HbAA offspring (Mendelian autosomal recessive inheritance).",
+      "CLINICAL IMPLICATIONS BY GENOTYPE: If this patient is HbSS: the pregnancy is high-risk requiring joint obstetric-haematology management with monthly clinic visits, serial haemoglobin monitoring (target Hb >7 g/dL), thromboprophylaxis, vigilance for vaso-occlusive crises, pre-eclampsia, and placental insufficiency, with delivery planned at a facility with blood bank and neonatal ICU. If HbAS: the pregnancy itself is not high-risk, but partner genotyping and genetic counselling are essential for informed reproductive decision-making.",
+      "TIME-DEPENDENT MORPHOLOGICAL SHIFT: At 30 minutes, the preparation typically shows a mixture weighted toward elongated/boat forms and holly-leaf cells, with some crescents. By 24 hours, as deoxygenation becomes more complete, the spectrum shifts toward predominantly crescents with some oat/filament forms. The elongated and holly-leaf forms diminish as polymer fibres grow longer, merge, and align. Tracking this temporal shift confirms that the preparation is functioning correctly and deoxygenation is progressive.",
+      "THE SPECTRUM OF POLYMERISATION: The coexistence of multiple sickle forms is a visual demonstration of HbS polymerisation as a continuous, probabilistic process rather than a binary event. Each cell sits somewhere on the spectrum from fully normal (no polymerisation) to fully sickled (maximum polymerisation), determined by its individual biochemical environment. Understanding this spectrum is essential for MLS students: sickling is not 'all-or-nothing' but rather a graded response that explains the clinical variability seen even among patients with the same genotype."
+    ],
+    "fields": [],
+    "sicklingConfig": { "sicklingRate": 0.45, "fields": [{ "seed": 40501 }, { "seed": 40502 }, { "seed": 40503 }] },
+    "source": "SVG-generated sickling test simulation",
     "license": "Educational use"
   }
 ];

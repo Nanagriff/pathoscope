@@ -15,8 +15,10 @@
  *  - Cytoplasm colours more vivid
  */
 
+export type StainType = "giemsa" | "wright-giemsa" | "sickling";
+
 export interface StainProfile {
-  id: "giemsa" | "wright-giemsa";
+  id: StainType;
 
   /** Background fill for the slide area */
   background: string;
@@ -210,10 +212,70 @@ export const WRIGHT_GIEMSA: StainProfile = {
   precipitateColour: "#3a1860",
 };
 
+// ── Sickling test (wet prep with Na2S2O5 reducing agent) ──
+
+export const SICKLING: StainProfile = {
+  id: "sickling" as StainType,
+
+  // Pale blue-grey background — wet prep, no stain
+  background: "#d8dce4",
+
+  // Olive-green/grey cells under reducing agent
+  rbcGradients: [
+    ["#c4c8b8", "#b0b4a0", "#98a088", "#889078", "#7c8468"],
+    ["#c0c4b4", "#acb09c", "#949c84", "#848c74", "#788064"],
+    ["#c8ccbc", "#b4b8a4", "#9ca48c", "#8c947c", "#808870"],
+    ["#bcc0b0", "#a8ac98", "#909880", "#808870", "#747c64"],
+    ["#ccd0c0", "#b8bca8", "#a0a890", "#909880", "#848c74"],
+    ["#c0c4b8", "#acb0a0", "#949c88", "#848c78", "#78806c"],
+    ["#d0d4c4", "#bcc0ac", "#a4ac94", "#949c84", "#888c78"],
+    ["#b8bcac", "#a4a894", "#8c947c", "#7c846c", "#707860"],
+  ],
+
+  parasitizedRbcGradient: ["#c4c8b8", "#b0b4a0", "#98a088", "#889078", "#7c8468"],
+
+  // White/clear central pallor
+  pallorStops: [
+    "rgba(232,236,240,0.80)",
+    "rgba(216,220,228,0.45)",
+    "rgba(200,204,212,0.15)",
+    "rgba(188,192,200,0)",
+  ],
+
+  // Not applicable for sickling but required by interface
+  parasiteRingStroke: "#606850",
+  parasiteRingFill: "rgba(96,104,80,0.06)",
+  parasiteDiffusion: "rgba(96,104,80,0.04)",
+  chromatinPrimary: "#505838",
+  chromatinSecondary: "#606848",
+
+  nucleusFill: "#404830",
+  nucleusParachromatin: "#586040",
+  nucleusDenseChromatin: "#303820",
+
+  neutrophilCyto: ["#b8bcb0", "#a0a498"],
+  neutrophilGranule: "#808878",
+
+  eosinophilCyto: ["#b8bcb0", "#a0a498"],
+  eosinophilGranule: [140, 148, 120],
+
+  lymphocyteCyto: ["#b0b4ac", "#989c94"],
+
+  monocyteCyto: ["#b4b8ac", "#9ca098"],
+
+  basophilCyto: ["#b0b4a8", "#989c90"],
+  basophilGranule: "#404830",
+
+  plateletOuter: "#b8bcc0",
+  plateletInner: "#808888",
+
+  membraneStroke: "#889080",
+  precipitateColour: "#505840",
+};
+
 /** Lookup by name */
 export const STAIN_PROFILES = {
   giemsa: GIEMSA,
   "wright-giemsa": WRIGHT_GIEMSA,
+  sickling: SICKLING,
 } as const;
-
-export type StainType = keyof typeof STAIN_PROFILES;
