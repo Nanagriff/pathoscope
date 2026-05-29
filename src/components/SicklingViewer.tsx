@@ -17,9 +17,11 @@ interface Props {
   /** 0 = negative (normal), 0.3-0.7 = positive (sickled) */
   sicklingRate: number;
   fields: { seed: number; sicklingRate?: number }[];
+  /** Exam mode — hides labels */
+  examMode?: boolean;
 }
 
-export default function SicklingViewer({ sicklingRate: defaultRate, fields: fieldConfigs }: Props) {
+export default function SicklingViewer({ sicklingRate: defaultRate, fields: fieldConfigs, examMode }: Props) {
   const defaultZoom = 2.5;
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -30,7 +32,7 @@ export default function SicklingViewer({ sicklingRate: defaultRate, fields: fiel
 
   const [currentField, setCurrentField] = useState(0);
   const [zoom, setZoom] = useState(defaultZoom);
-  const [showAnnotations, setShowAnnotations] = useState(true);
+  const [showAnnotations, setShowAnnotations] = useState(!examMode);
   const [activeCell, setActiveCell] = useState<CellData | null>(null);
   const [transitioning, setTransitioning] = useState(false);
 
@@ -255,10 +257,10 @@ export default function SicklingViewer({ sicklingRate: defaultRate, fields: fiel
         <span className="text-[10px] text-gray-400 hidden sm:inline">{currentField + 1}/{fieldConfigs.length}</span>
         <div className="flex-1" />
         <span className="text-[10px] text-gray-300 tabular-nums">{zoom.toFixed(1)}x</span>
-        <button onClick={() => setShowAnnotations(!showAnnotations)}
+        {!examMode && <button onClick={() => setShowAnnotations(!showAnnotations)}
           className={`h-7 px-2 rounded text-[10px] font-medium transition-colors ${showAnnotations ? "bg-emerald-700 text-white" : "bg-gray-800 text-gray-400"}`}>
           Labels
-        </button>
+        </button>}
       </div>
 
       {/* Viewport */}

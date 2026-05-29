@@ -14,6 +14,31 @@ const ZOOM_STEP = 1.12;
 const INERTIA_DECAY = 0.92;
 const INERTIA_MIN = 0.05;
 
+// Urine microscopy objectives — ×10 (scanning/LPF) and ×40 (HPF)
+const URINE_OBJECTIVES = [
+  { label: "×20", zoom: 0.9, color: "#4ade80", desc: "Scanning" },
+  { label: "×40", zoom: 2.2, color: "#60a5fa", desc: "High power" },
+] as const;
+
+type UObj = { label: string; zoom: number; color: string; desc: string };
+function nearestUrineObj(z: number): UObj {
+  let best: UObj = URINE_OBJECTIVES[0];
+  let bestD = Infinity;
+  for (const o of URINE_OBJECTIVES) {
+    const d = Math.abs(Math.log(z) - Math.log(o.zoom));
+    if (d < bestD) { bestD = d; best = o; }
+  }
+  return best;
+}
+function stepUrineObj(z: number, dir: 1 | -1): number {
+  const cur = nearestUrineObj(z);
+  const idx = URINE_OBJECTIVES.findIndex(o => o.label === cur.label);
+  const next = idx + dir;
+  if (next < 0) return URINE_OBJECTIVES[0].zoom;
+  if (next >= URINE_OBJECTIVES.length) return URINE_OBJECTIVES[URINE_OBJECTIVES.length - 1].zoom;
+  return URINE_OBJECTIVES[next].zoom;
+}
+
 type UrineElement = {
   id: number;
   type: string;
@@ -29,6 +54,8 @@ type UrineElement = {
 interface Props {
   config: UrineConfig;
   fields: { seed: number }[];
+  /** Exam mode — hides labels, starts at ×40 HPF */
+  examMode?: boolean;
 }
 
 const ELEMENT_INFO: Record<string, { label: string; desc: string }> = {
@@ -185,18 +212,19 @@ function UrineBackground({ seed, width, height }: { seed: number; width: number;
   );
 }
 
-export default function UrineViewer({ config, fields }: Props) {
+export default function UrineViewer({ config, fields, examMode }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const cameraRef = useRef<Camera>({ x: SLIDE_W / 2, y: SLIDE_H / 2, zoom: 2.5 });
+  const cameraRef = useRef<Camera>({ x: SLIDE_W / 2, y: SLIDE_H / 2, zoom: URINE_OBJECTIVES[0].zoom });
   const velRef = useRef({ vx: 0, vy: 0 });
   const dragRef = useRef<{ active: boolean; startX: number; startY: number; camStartX: number; camStartY: number; lastX: number; lastY: number; lastTime: number } | null>(null);
   const rafRef = useRef(0);
   const elementsRef = useRef<UrineElement[]>([]);
+  const zoomToRef = useRef<(z: number) => void>(() => {});
 
   const [currentField, setCurrentField] = useState(0);
-  const [zoom, setZoom] = useState(2.5);
-  const [showAnnotations, setShowAnnotations] = useState(true);
+  const [zoom, setZoom] = useState<number>(URINE_OBJECTIVES[0].zoom);
+  const [showAnnotations, setShowAnnotations] = useState(!examMode);
   const [activeCell, setActiveCell] = useState<UrineElement | null>(null);
   const [, forceUpdate] = useState(0);
 
@@ -266,8 +294,26 @@ export default function UrineViewer({ config, fields }: Props) {
   const onPointerMove = useCallback((e: RE<SVGSVGElement>) => { const drag = dragRef.current; if (!drag?.active) return; const cam = cameraRef.current; const svg = svgRef.current; if (!svg) return; const rect = svg.getBoundingClientRect(); const scale = (SLIDE_W / cam.zoom) / rect.width; cam.x = drag.camStartX - (e.clientX - drag.startX) * scale; cam.y = drag.camStartY - (e.clientY - drag.startY) * scale; const now = performance.now(); const dt = now - drag.lastTime; if (dt > 0) { velRef.current.vx = ((e.clientX - drag.lastX) / dt) * 16; velRef.current.vy = ((e.clientY - drag.lastY) / dt) * 16; } drag.lastX = e.clientX; drag.lastY = e.clientY; drag.lastTime = now; applyCamera(); }, [applyCamera]);
   const onPointerUp = useCallback(() => { if (dragRef.current) dragRef.current.active = false; }, []);
 
-  // Wheel zoom
-  useEffect(() => { const svg = svgRef.current; if (!svg) return; const onWheel = (e: WheelEvent) => { e.preventDefault(); const cam = cameraRef.current; const factor = e.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP; const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, cam.zoom * factor)); const rect = svg.getBoundingClientRect(); const px = (e.clientX - rect.left) / rect.width; const py = (e.clientY - rect.top) / rect.height; const viewW = SLIDE_W / cam.zoom; const viewH = viewW / (rect.width / rect.height); const worldX = cam.x - viewW / 2 + px * viewW; const worldY = cam.y - viewH / 2 + py * viewH; const newViewW = SLIDE_W / newZoom; const newViewH = newViewW / (rect.width / rect.height); cam.x = worldX + (0.5 - px) * newViewW; cam.y = worldY + (0.5 - py) * newViewH; cam.zoom = newZoom; setZoom(newZoom); applyCamera(); }; svg.addEventListener("wheel", onWheel, { passive: false }); return () => svg.removeEventListener("wheel", onWheel); }, [applyCamera]);
+  // Animated zoom
+  const zoomTo = useCallback((targetZoom: number) => {
+    const cam = cameraRef.current;
+    const startZoom = cam.zoom;
+    const startTime = performance.now();
+    const animate = (now: number) => {
+      const t = Math.min(1, (now - startTime) / 300);
+      cam.zoom = startZoom + (targetZoom - startZoom) * (1 - Math.pow(1 - t, 3));
+      setZoom(cam.zoom);
+      applyCamera();
+      if (t < 1) requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
+  }, [applyCamera]);
+  zoomToRef.current = zoomTo;
+
+  // Wheel: step between objectives
+  const wheelSteppingRef = useRef(false);
+  const wheelTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => { const svg = svgRef.current; if (!svg) return; const onWheel = (e: WheelEvent) => { e.preventDefault(); if (wheelSteppingRef.current) return; wheelSteppingRef.current = true; const dir: 1 | -1 = e.deltaY < 0 ? 1 : -1; const target = stepUrineObj(cameraRef.current.zoom, dir); zoomToRef.current(target); if (wheelTimeoutRef.current) clearTimeout(wheelTimeoutRef.current); wheelTimeoutRef.current = setTimeout(() => { wheelSteppingRef.current = false; }, 400); }; svg.addEventListener("wheel", onWheel, { passive: false }); return () => svg.removeEventListener("wheel", onWheel); }, [applyCamera]);
 
   // Pinch zoom
   const touchRef = useRef<{ startDist: number; startZoom: number; startMidX: number; startMidY: number; camStartX: number; camStartY: number } | null>(null);
@@ -289,7 +335,7 @@ export default function UrineViewer({ config, fields }: Props) {
   const goToCell = useCallback((el: UrineElement) => {
     const cam = cameraRef.current;
     const startX = cam.x, startY = cam.y, startZoom = cam.zoom;
-    const targetZoom = 5;
+    const targetZoom = URINE_OBJECTIVES[1].zoom; // zoom to ×40 HPF
     const startTime = performance.now();
     const animate = (now: number) => {
       const t = Math.min(1, (now - startTime) / 400);
@@ -341,12 +387,34 @@ export default function UrineViewer({ config, fields }: Props) {
           ))}
         </div>
         <span className="text-[10px] text-gray-400 hidden sm:inline">{currentField + 1}/{fields.length}</span>
+        <div className="w-px h-5 bg-gray-700 mx-0.5" />
+        {/* Objective selector */}
+        <div className="flex items-center bg-gray-800 rounded overflow-hidden">
+          {URINE_OBJECTIVES.map((obj) => {
+            const active = nearestUrineObj(zoom).label === obj.label;
+            return (
+              <button key={obj.label} onClick={() => zoomTo(obj.zoom)}
+                className={`h-7 px-2.5 text-[10px] font-semibold transition-all duration-200 ${
+                  active ? "text-white" : "text-gray-400 hover:text-gray-200"
+                }`}
+                style={active ? { backgroundColor: obj.color + "30", color: obj.color } : undefined}
+                title={`${obj.label} — ${obj.desc}`}>
+                {obj.label}
+              </button>
+            );
+          })}
+        </div>
+        <span className="text-[10px] tabular-nums" style={{ color: nearestUrineObj(zoom).color }}>
+          {nearestUrineObj(zoom).label}
+          <span className="text-gray-500 ml-1 hidden sm:inline">{nearestUrineObj(zoom).desc}</span>
+        </span>
         <div className="flex-1" />
-        <span className="text-[10px] text-gray-300 tabular-nums">{zoom.toFixed(1)}x</span>
-        <button onClick={() => setShowAnnotations(!showAnnotations)}
-          className={`h-7 px-2 rounded text-[10px] font-medium transition-colors ${showAnnotations ? "bg-amber-700 text-white" : "bg-gray-800 text-gray-400"}`}>
-          Labels
-        </button>
+        {!examMode && (
+          <button onClick={() => setShowAnnotations(!showAnnotations)}
+            className={`h-7 px-2 rounded text-[10px] font-medium transition-colors ${showAnnotations ? "bg-amber-700 text-white" : "bg-gray-800 text-gray-400"}`}>
+            Labels
+          </button>
+        )}
       </div>
 
       {/* Viewport */}

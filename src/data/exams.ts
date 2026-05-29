@@ -21,6 +21,12 @@ export interface ExamSlideConfig {
   species?: MalariaSpecies;
   stage?: ParasiteStage;
   filmType?: "thin" | "thick";
+  /** Slide mode — determines which viewer to use */
+  mode?: "blood" | "urine" | "sickling";
+  /** Urine sediment config for urine-mode exams */
+  urineConfig?: import("@/data/cases").UrineConfig;
+  /** Sickling rate for sickling-mode exams */
+  sicklingRate?: number;
 }
 
 export interface ExamQuestion {
@@ -38,6 +44,10 @@ export interface Exam {
   id: string;
   title: string;
   discipline: string;
+  /** Department grouping for exam listing */
+  department: "haematology" | "microbiology";
+  /** Subcategory within department */
+  subcategory: "haematoparasitology" | "morphology" | "wet-prep" | "stained-prep" | "culture";
   description: string;
   difficulty: Difficulty;
   timeLimit?: number;
@@ -129,11 +139,60 @@ const Q: Record<string, ExamQuestion> = {
   wbc_hyper: { id: "wbc7", type: "wbc-differential", slide: { seed: 98007, stainType: "wright-giemsa", parasitemia: 0 }, prompt: "A neutrophil with 7 lobes. What does this suggest?", options: ["Normal variant", "Megaloblastic anaemia (B12/folate deficiency)", "Chronic infection", "CML"], correctAnswer: "Megaloblastic anaemia (B12/folate deficiency)", explanation: "Hypersegmentation (\u22656 lobes) = megaloblastic anaemia. Request B12, folate, reticulocyte count.", points: 15 },
 };
 
+// ── Urine slide helper ──
+function urineSlide(seed: number, overrides: Partial<import("@/data/cases").UrineConfig> = {}): ExamSlideConfig {
+  const base: import("@/data/cases").UrineConfig = {
+    seed, pusCells: 0, rbcs: 0, epithelial: 0, urothelialEpi: 0, tubularEpi: 0,
+    calciumOxalate: 0, triplePhosphate: 0, uricAcid: 0, ammoniumBiurate: 0, amorphousCrystals: 0,
+    hyalineCasts: 0, granularCasts: 0, yeast: 0, bacteria: 0, spermatozoa: 0, clueCells: 0, mucusThreads: 0,
+    fields: [{ seed }], ...overrides,
+  };
+  return { seed, stainType: "giemsa", parasitemia: 0, mode: "urine", urineConfig: base };
+}
+
+// ── URINE SEDIMENT questions ──
+const U: Record<string, ExamQuestion> = {
+  ur_wbc_high: { id: "ur1", type: "identify-finding", slide: urineSlide(80001, { pusCells: 200, rbcs: 15, bacteria: 80, epithelial: 2 }), prompt: "Examine this urine sediment. Identify the predominant cellular finding.", options: ["WBCs (pus cells)", "RBCs", "Yeast cells", "Renal tubular epithelial cells"], correctAnswer: "WBCs (pus cells)", explanation: "Pus cells (WBCs/neutrophils). >5/HPF = pyuria, strongly suggests UTI. These are larger than RBCs with visible granular cytoplasm and faintly lobulated nucleus.", points: 10 },
+  ur_rbc_vs_yeast: { id: "ur2", type: "identify-cell", slide: urineSlide(80002, { yeast: 40, rbcs: 20, pusCells: 15 }), prompt: "Examine this sediment. Small round refractile cells are present. Some show budding. Identify them.", options: ["RBCs", "Yeast (Candida)", "WBCs", "Bacteria"], correctAnswer: "Yeast (Candida)", explanation: "Yeast cells. Key: BUDDING — a daughter cell attached by a narrow neck. RBCs are similar size but do not bud. Add KOH to confirm.", points: 15 },
+  ur_epi_contam: { id: "ur3", type: "identify-finding", slide: urineSlide(80003, { epithelial: 25, bacteria: 100, mucusThreads: 8, pusCells: 8 }), prompt: "Examine this sediment. Large flat cells are numerous with mixed bacteria. What is the significance?", options: ["Normal finding", "Specimen contamination — recollect", "Renal tubular damage", "Bladder carcinoma"], correctAnswer: "Specimen contamination — recollect", explanation: "Numerous squamous epithelial cells (>5/HPF) = contamination from vulvovaginal/perineal skin. Mixed bacteria are from skin flora. Report as unsatisfactory and request clean-catch recollection.", points: 15 },
+  ur_cast_type: { id: "ur4", type: "identify-cell", slide: urineSlide(80004, { granularCasts: 6, hyalineCasts: 2, pusCells: 30, rbcs: 10, tubularEpi: 3 }), prompt: "Examine this sediment at 10x. Identify the cylindrical structures with granular content.", options: ["Mucus thread", "Granular cast", "Hyaline cast", "Fibre artifact"], correctAnswer: "Granular cast", explanation: "Granular cast — cylindrical mould with granular content. Indicates RENAL TUBULAR PATHOLOGY. Key distinction from mucus: casts have parallel sides and rounded ends.", points: 15 },
+  ur_crystal_caox: { id: "ur5", type: "identify-cell", slide: urineSlide(80005, { calciumOxalate: 15, pusCells: 5, rbcs: 3 }), prompt: "Examine this sediment. Identify the colourless geometric structures.", options: ["Calcium oxalate", "Triple phosphate", "Uric acid", "Cystine"], correctAnswer: "Calcium oxalate", explanation: "Calcium oxalate (dihydrate) — octahedral 'envelope' shape. Most common crystal. Found in acidic urine. Abundant crystals = stone risk.", points: 10 },
+  ur_crystal_triphos: { id: "ur6", type: "identify-cell", slide: urineSlide(80006, { triplePhosphate: 10, pusCells: 20, bacteria: 60 }), prompt: "Examine this sediment. Identify the large 3D prismatic crystals.", options: ["Triple phosphate (struvite)", "Calcium oxalate", "Uric acid", "Amorphous phosphates"], correctAnswer: "Triple phosphate (struvite)", explanation: "Triple phosphate (struvite, MgNH4PO4). 'Coffin lid' shape. Found in ALKALINE urine. Associated with UTI by urease-producing organisms (Proteus, Klebsiella).", points: 10 },
+  ur_trich: { id: "ur7", type: "identify-cell", slide: urineSlide(80007, { trichomonas: 5, pusCells: 80, epithelial: 8, bacteria: 60 }), prompt: "Examine this wet prep. Identify the pear-shaped motile organisms.", options: ["Trichomonas vaginalis", "WBC", "Yeast cell", "Renal tubular cell"], correctAnswer: "Trichomonas vaginalis", explanation: "Trichomonas vaginalis — flagellated protozoan. Key: MOTILITY (jerky twitching). Pear-shaped, 10-30 µm, eccentric nucleus, undulating membrane. STI — treat both partners.", points: 15 },
+  ur_schisto: { id: "ur8", type: "identify-cell", slide: urineSlide(80008, { schistosomaHaematobiumEggs: 4, rbcs: 200, pusCells: 40 }), prompt: "Examine this urine from a boy with haematuria. Identify the large oval structure with a pointed end.", options: ["Schistosoma haematobium egg", "Schistosoma mansoni egg", "Enterobius egg", "Air bubble"], correctAnswer: "Schistosoma haematobium egg", explanation: "S. haematobium egg — TERMINAL spine (key). S. mansoni has a LATERAL spine. Found in urine = bladder schistosomiasis. In Ghana, endemic in northern regions near dams.", points: 20 },
+  ur_pyuria_sig: { id: "ur9", type: "true-false", slide: urineSlide(80009, { pusCells: 100, bacteria: 10 }), prompt: "T/F: Pyuria (>5 WBCs/HPF) always indicates bacterial UTI.", options: ["True", "False"], correctAnswer: "False", explanation: "False. Pyuria indicates INFLAMMATION, not necessarily bacterial infection. Sterile pyuria occurs with: TB, kidney stones, interstitial nephritis, partially treated UTI, and Trichomonas infection.", points: 10 },
+  ur_nitrite: { id: "ur10", type: "true-false", slide: urineSlide(80010, { pusCells: 150, bacteria: 120, rbcs: 10 }), prompt: "T/F: A negative nitrite result on dipstick rules out UTI.", options: ["True", "False"], correctAnswer: "False", explanation: "False. Nitrites are produced by Gram-negative bacteria only. Gram-positive organisms (Enterococcus, Staphylococcus) do NOT reduce nitrates. Also false negatives with short bladder incubation, dilute urine, and vitamin C.", points: 10 },
+  ur_rte: { id: "ur11", type: "identify-cell", slide: urineSlide(80011, { tubularEpi: 8, granularCasts: 5, pusCells: 50, rbcs: 30 }), prompt: "Examine this sediment. Identify the small round cells with large nuclei near the casts.", options: ["Renal tubular epithelial cells", "WBCs", "Transitional cells", "Macrophages"], correctAnswer: "Renal tubular epithelial cells", explanation: "Renal tubular epithelial (RTE) cells with pigmented granules. KEY indicator of acute tubular injury/necrosis. Must be reported urgently — indicates renal parenchymal damage.", points: 20 },
+  ur_uroEpi: { id: "ur12", type: "identify-cell", slide: urineSlide(80012, { urothelialEpi: 6, pusCells: 20, epithelial: 3 }), prompt: "Examine this sediment. Identify the medium-sized cells with prominent nuclei — larger than WBCs but smaller than squamous epithelial cells.", options: ["Transitional (urothelial) cell — bladder/ureter", "Squamous epithelial — skin contamination", "Renal tubular cell — kidney", "Macrophage"], correctAnswer: "Transitional (urothelial) cell — bladder/ureter", explanation: "Urothelial (transitional) epithelial cell. Medium size (30-40 µm), variable shape (round/oval/pear/caudate), prominent nucleus. From bladder, ureters, or renal pelvis.", points: 10 },
+};
+
+// ── SICKLING questions ──
+function sicklingSlide(seed: number, rate: number): ExamSlideConfig {
+  return { seed, stainType: "sickling" as StainType, parasitemia: 0, mode: "sickling", sicklingRate: rate };
+}
+
+const S: Record<string, ExamQuestion> = {
+  sk_pos_crescent: { id: "sk1", type: "identify-finding", slide: sicklingSlide(81001, 0.4), prompt: "Examine this sodium metabisulphite wet prep. What is the result?", options: ["Sickling test POSITIVE", "Sickling test NEGATIVE", "Inconclusive — repeat", "Target cells only"], correctAnswer: "Sickling test POSITIVE", explanation: "POSITIVE. Crescent-shaped cells (classic sickle form) confirm the presence of HbS. The reducing agent (Na2S2O5) deoxygenates haemoglobin, causing HbS to polymerise and distort RBCs.", points: 10 },
+  sk_neg: { id: "sk2", type: "identify-finding", slide: sicklingSlide(81002, 0), prompt: "Examine this sodium metabisulphite wet prep after 30 minutes incubation. Result?", options: ["Sickling test NEGATIVE", "Sickling test POSITIVE", "Insufficient time — wait longer", "HbC disease"], correctAnswer: "Sickling test NEGATIVE", explanation: "NEGATIVE (HbAA). No sickling after adequate incubation (20-30 min). All RBCs maintain normal biconcave disc morphology. No HbS present.", points: 10 },
+  sk_trait_vs_disease: { id: "sk3", type: "true-false", slide: sicklingSlide(81003, 0.25), prompt: "T/F: The sickling test distinguishes between sickle cell TRAIT (HbAS) and sickle cell DISEASE (HbSS).", options: ["True", "False"], correctAnswer: "False", explanation: "False. The sickling test only detects the PRESENCE of HbS — both HbAS (trait) and HbSS (disease) give POSITIVE results. Hb electrophoresis is needed to distinguish them.", points: 15 },
+  sk_morphology: { id: "sk4", type: "identify-cell", slide: sicklingSlide(81004, 0.5), prompt: "Examine this positive sickling test. Which cell shape is MOST characteristic?", options: ["Crescent/sickle shape", "Holly-leaf shape", "Target cell", "Spherocyte"], correctAnswer: "Crescent/sickle shape", explanation: "The crescent/sickle shape is the classic morphology. Holly-leaf and oat-shaped cells may also appear. Target cells are seen on peripheral blood film but are NOT specific to the sickling test.", points: 10 },
+  sk_timing: { id: "sk5", type: "identify-finding", slide: sicklingSlide(81005, 0), prompt: "This sickling test was read at 5 minutes. No sickling seen. What should you do?", options: ["Report as negative", "Incubate for 20-30 minutes and re-examine", "Add more reducing agent", "Repeat with fresh sample"], correctAnswer: "Incubate for 20-30 minutes and re-examine", explanation: "Too early. Sickling may take 20-30 minutes to develop, especially in HbAS (trait) where HbS concentration is lower. Always incubate for the full recommended time before reporting negative.", points: 15 },
+  sk_control: { id: "sk6", type: "true-false", slide: sicklingSlide(81006, 0.35), prompt: "T/F: A positive control should be run with every batch of sickling tests.", options: ["True", "False"], correctAnswer: "True", explanation: "True. A known HbAS or HbSS sample must be run as a positive control to verify that the reducing agent is working. Without a control, false negatives cannot be detected.", points: 10 },
+  sk_holly: { id: "sk7", type: "identify-cell", slide: sicklingSlide(81007, 0.45), prompt: "Examine this positive sickling test. Identify the irregularly shaped cells with multiple pointed projections.", options: ["Holly-leaf form", "Crescent form", "Oat-shaped form", "Crenated cell"], correctAnswer: "Holly-leaf form", explanation: "Holly-leaf form — irregular with multiple pointed projections. This is a variant sickling morphology alongside crescents (classic) and oat shapes (elongated). All indicate positive HbS.", points: 10 },
+  sk_newborn: { id: "sk8", type: "true-false", slide: sicklingSlide(81008, 0), prompt: "T/F: The sickling test is reliable for screening newborns for sickle cell disease.", options: ["True", "False"], correctAnswer: "False", explanation: "False. Newborns have predominantly HbF (fetal haemoglobin) which does not sickle. The sickling test may give false negatives in neonates. Hb electrophoresis or IEF at 3-6 months is the standard newborn screen.", points: 15 },
+};
+
 // Convert bank to array and helper to draw random subset
 const allQ = Object.values(Q);
 
 function bankFor(...keys: string[]): ExamQuestion[] {
   return keys.map(k => Q[k]).filter(Boolean);
+}
+function urineBank(...keys: string[]): ExamQuestion[] {
+  return keys.map(k => U[k]).filter(Boolean);
+}
+function sicklingBank(...keys: string[]): ExamQuestion[] {
+  return keys.map(k => S[k]).filter(Boolean);
 }
 
 export const exams: Exam[] = [
@@ -141,6 +200,8 @@ export const exams: Exam[] = [
     id: "student-malaria",
     title: "Malaria Microscopy \u2014 Student",
     discipline: "malaria",
+    department: "haematology",
+    subcategory: "haematoparasitology",
     description: "ECAMM-structured assessment: detection (thick film), species identification (thin film), stage recognition, and basic quantitation. Questions rotate each attempt.",
     difficulty: "student",
     timeLimit: 900,
@@ -158,6 +219,8 @@ export const exams: Exam[] = [
     id: "student-wbc",
     title: "WBC Identification \u2014 Student",
     discipline: "hematology",
+    department: "haematology",
+    subcategory: "morphology",
     description: "Identify the five normal WBC types and recognise common morphological traps.",
     difficulty: "student",
     timeLimit: 600,
@@ -168,6 +231,8 @@ export const exams: Exam[] = [
     id: "mls-malaria",
     title: "Malaria Competency \u2014 MLS",
     discipline: "malaria",
+    department: "haematology",
+    subcategory: "haematoparasitology",
     description: "Professional competency: detection with traps, species/stage on tricky slides, WHO quantitation formula, and structured film reporting. Questions rotate.",
     difficulty: "mls",
     timeLimit: 900,
@@ -187,6 +252,8 @@ export const exams: Exam[] = [
     id: "specialist-malaria",
     title: "Diagnostic Traps \u2014 Specialist",
     discipline: "malaria",
+    department: "haematology",
+    subcategory: "haematoparasitology",
     description: "Edge cases: very low parasitemia, zero-parasitemia platelet traps, leukopenic quantitation, critical values. Every question is designed to expose diagnostic errors.",
     difficulty: "specialist",
     timeLimit: 720,
@@ -206,6 +273,8 @@ export const exams: Exam[] = [
     id: "consultant-malaria",
     title: "ECAMM Competency \u2014 Consultant",
     discipline: "malaria",
+    department: "haematology",
+    subcategory: "haematoparasitology",
     description: "WHO-standard 15-question panel covering all ECAMM domains. Detection panel (5 slides), species panel, quantitation, critical values, and QA scenarios. Passing: Level 1 (\u226590% detection, \u226580% species, \u226540% quant).",
     difficulty: "consultant",
     timeLimit: 1200,
@@ -225,10 +294,95 @@ export const exams: Exam[] = [
     id: "mls-haematology",
     title: "Haematology Reporting \u2014 MLS",
     discipline: "hematology",
+    department: "haematology",
+    subcategory: "morphology",
     description: "WBC differential accuracy and clinical interpretation for professional reporting.",
     difficulty: "mls",
     timeLimit: 600,
     questionsPerAttempt: 6,
     questionBank: bankFor("wbc_neut", "wbc_eos", "wbc_baso", "wbc_lymph", "wbc_mono", "wbc_trap", "wbc_hyper"),
+  },
+  // ── URINE SEDIMENT EXAMS ──
+  {
+    id: "student-urine",
+    title: "Urine Sediment \u2014 Student",
+    discipline: "urinalysis",
+    department: "microbiology",
+    subcategory: "wet-prep",
+    description: "Identify common urine sediment elements: WBCs, RBCs, epithelial cells, crystals, casts, and organisms. Understand significance of findings.",
+    difficulty: "student",
+    timeLimit: 600,
+    questionsPerAttempt: 6,
+    questionBank: urineBank(
+      "ur_wbc_high", "ur_rbc_vs_yeast", "ur_epi_contam",
+      "ur_crystal_caox", "ur_crystal_triphos",
+      "ur_pyuria_sig", "ur_nitrite",
+      "ur_uroEpi",
+    ),
+  },
+  {
+    id: "mls-urine",
+    title: "Urine Microscopy \u2014 MLS",
+    discipline: "urinalysis",
+    department: "microbiology",
+    subcategory: "wet-prep",
+    description: "Professional competency: identify all sediment elements, recognise organisms (Trichomonas, Schistosoma, Candida), interpret casts, and assess specimen quality.",
+    difficulty: "mls",
+    timeLimit: 900,
+    questionsPerAttempt: 10,
+    questionBank: urineBank(
+      "ur_wbc_high", "ur_rbc_vs_yeast", "ur_epi_contam", "ur_cast_type",
+      "ur_crystal_caox", "ur_crystal_triphos",
+      "ur_trich", "ur_schisto", "ur_rte",
+      "ur_pyuria_sig", "ur_nitrite", "ur_uroEpi",
+    ),
+  },
+  {
+    id: "specialist-urine",
+    title: "Urine Diagnostics \u2014 Specialist",
+    discipline: "urinalysis",
+    department: "microbiology",
+    subcategory: "wet-prep",
+    description: "Advanced: parasitic eggs, Trichomonas identification, renal tubular injury markers, sterile pyuria differentials, cast interpretation, and specimen adequacy assessment.",
+    difficulty: "specialist",
+    timeLimit: 720,
+    questionsPerAttempt: 10,
+    questionBank: urineBank(
+      "ur_wbc_high", "ur_rbc_vs_yeast", "ur_epi_contam", "ur_cast_type",
+      "ur_crystal_caox", "ur_crystal_triphos",
+      "ur_trich", "ur_schisto", "ur_rte",
+      "ur_pyuria_sig", "ur_nitrite", "ur_uroEpi",
+    ),
+  },
+  // ── SICKLING EXAMS ──
+  {
+    id: "student-sickling",
+    title: "Sickling Test \u2014 Student",
+    discipline: "hematology",
+    department: "haematology",
+    subcategory: "wet-prep",
+    description: "Identify positive and negative sickling tests. Recognise sickle cell morphology (crescent, holly-leaf, oat shapes). Understand test limitations.",
+    difficulty: "student",
+    timeLimit: 600,
+    questionsPerAttempt: 5,
+    questionBank: sicklingBank(
+      "sk_pos_crescent", "sk_neg", "sk_morphology",
+      "sk_timing", "sk_trait_vs_disease",
+    ),
+  },
+  {
+    id: "mls-sickling",
+    title: "Sickling & Haemoglobinopathy \u2014 MLS",
+    discipline: "hematology",
+    department: "haematology",
+    subcategory: "wet-prep",
+    description: "Professional competency: interpret sickling tests, identify all morphological variants, understand QC requirements, and know limitations (newborn screening, trait vs disease).",
+    difficulty: "mls",
+    timeLimit: 600,
+    questionsPerAttempt: 7,
+    questionBank: sicklingBank(
+      "sk_pos_crescent", "sk_neg", "sk_trait_vs_disease", "sk_morphology",
+      "sk_timing", "sk_control", "sk_holly", "sk_newborn",
+    ),
   },
 ];

@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import type { Exam, ExamQuestion, ExamScore, Difficulty } from "@/data/exams";
 import { exams, DIFFICULTY_META } from "@/data/exams";
 import SVGSlideViewer from "./SVGSlideViewer";
+import UrineViewer from "./UrineViewer";
+import SicklingViewer from "./SicklingViewer";
 import { generateSlide } from "./microscope/generateSlide";
 
 interface Props {
@@ -335,20 +337,36 @@ export default function SVGExamViewer({ exam }: Props) {
 
       {/* Main: slide + question */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
-        {/* Slide */}
+        {/* Slide — renders appropriate viewer based on mode */}
         <div className="flex-1 min-w-0 min-h-0">
-          <SVGSlideViewer
-            key={q.id}
-            stainType={q.slide.stainType}
-            parasitemia={q.slide.parasitemia}
-            fields={[{ seed: q.slide.seed }]}
-            species={q.slide.species}
-            stage={q.slide.stage}
-            showFilmToggle={false}
-            examMode={!submitted}
-            initialFilmType={q.slide.filmType}
-            focusIndicator={!submitted ? focusIndicator : undefined}
-          />
+          {q.slide.mode === "urine" && q.slide.urineConfig ? (
+            <UrineViewer
+              key={q.id}
+              config={q.slide.urineConfig}
+              fields={q.slide.urineConfig.fields}
+              examMode
+            />
+          ) : q.slide.mode === "sickling" ? (
+            <SicklingViewer
+              key={q.id}
+              sicklingRate={q.slide.sicklingRate ?? 0}
+              fields={[{ seed: q.slide.seed }]}
+              examMode
+            />
+          ) : (
+            <SVGSlideViewer
+              key={q.id}
+              stainType={q.slide.stainType}
+              parasitemia={q.slide.parasitemia}
+              fields={[{ seed: q.slide.seed }]}
+              species={q.slide.species}
+              stage={q.slide.stage}
+              showFilmToggle={false}
+              examMode={!submitted}
+              initialFilmType={q.slide.filmType}
+              focusIndicator={!submitted ? focusIndicator : undefined}
+            />
+          )}
         </div>
 
         {/* Question panel */}
