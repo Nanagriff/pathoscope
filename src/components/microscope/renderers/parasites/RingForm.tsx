@@ -20,13 +20,13 @@ export function RingForm({ seed, baseR, stain, isVivax }: ParasiteStageProps) {
   const cy = Math.sin(rAngle) * rDist;
 
   const dotAngle = rng() * Math.PI * 2;
-  const dotR = isVivax ? (0.4 + rng() * 0.25) : (0.3 + rng() * 0.2);
+  const dotR = isVivax ? (0.3 + rng() * 0.15) : (0.2 + rng() * 0.12);
   const dotX = cx + Math.cos(dotAngle) * ringR * (0.7 + rng() * 0.3);
   const dotY = cy + Math.sin(dotAngle) * ringR * (0.7 + rng() * 0.3);
 
-  let arcThickMin = isVivax ? 0.25 : 0.12;
-  let arcThickMax = isVivax ? 0.45 : 0.35;
-  let arcOpacity = isVivax ? 0.6 : 0.5 + rng() * 0.2;
+  const arcThickMin = isVivax ? 0.18 : 0.08;
+  const arcThickMax = isVivax ? 0.32 : 0.22;
+  let arcOpacity = isVivax ? 0.45 : 0.35 + rng() * 0.15;
 
   // Arc variant
   const variant = rng();
@@ -40,7 +40,7 @@ export function RingForm({ seed, baseR, stain, isVivax }: ParasiteStageProps) {
   // Chromatin pre-compute
   const dotRy = n(dotR * (0.7 + rng() * 0.5));
   const dotRot = n(rng() * 360);
-  const dotOp = n(0.85 + rng() * 0.1);
+  const dotOp = n(0.55 + rng() * 0.15);
   const innerDotCx = n(dotX + (rng() - 0.5) * dotR * 0.4);
   const innerDotCy = n(dotY + (rng() - 0.5) * dotR * 0.4);
 
@@ -52,7 +52,7 @@ export function RingForm({ seed, baseR, stain, isVivax }: ParasiteStageProps) {
   const dot2Y = cy + Math.sin(dot2Angle) * ringR * (0.7 + rng() * 0.3);
   const dot2Ry = n(dot2R * (0.7 + rng() * 0.5));
   const dot2Rot = n(rng() * 360);
-  const dot2Op = n(0.80 + rng() * 0.1);
+  const dot2Op = n(0.50 + rng() * 0.1);
 
   return (
     <g>
@@ -70,8 +70,8 @@ export function RingForm({ seed, baseR, stain, isVivax }: ParasiteStageProps) {
       <ellipse cx={n(dotX)} cy={n(dotY)} rx={n(dotR)} ry={dotRy}
         transform={`rotate(${dotRot},${n(dotX)},${n(dotY)})`}
         fill={stain.chromatinPrimary} opacity={dotOp} filter="url(#chromatin-tex)" />
-      <circle cx={innerDotCx} cy={innerDotCy} r={n(dotR * 0.35)}
-        fill={stain.nucleusDenseChromatin} opacity={0.6} />
+      <circle cx={innerDotCx} cy={innerDotCy} r={n(dotR * 0.3)}
+        fill={stain.nucleusDenseChromatin} opacity={0.35} />
 
       {/* Second dot */}
       {hasSecond && (

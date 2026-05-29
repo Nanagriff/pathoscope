@@ -51,6 +51,10 @@ export interface UrineConfig {
   spermatozoa: number;
   clueCells: number;
   mucusThreads: number;
+  trichomonas?: number;
+  schistosomaHaematobiumEggs?: number;
+  microfilaria?: number;
+  enterobiusVermicularis?: number;
   fields: { seed: number }[];
 }
 
@@ -556,6 +560,269 @@ export const cases: SlideCase[] = [
       "bacteria": 15, "spermatozoa": 0, "clueCells": 0,
       "mucusThreads": 3,
       "fields": [{ "seed": 30301 }, { "seed": 30302 }, { "seed": 30303 }]
+    },
+    "source": "SVG-generated urine sediment simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "urine-acute-uti",
+    "title": "Acute Uncomplicated UTI",
+    "discipline": "urinalysis",
+    "category": "Urine R/E",
+    "clinicalHistory": "22-year-old female university student from Legon, Greater Accra Region, presenting to the campus health centre with 2-day history of dysuria, urinary frequency, urgency, and suprapubic discomfort. No fever, no flank pain, no vaginal discharge. Sexually active with one partner. No previous UTI. Physical examination: afebrile (36.5°C), mild suprapubic tenderness, no costovertebral angle tenderness.",
+    "labData": "Urine Dipstick:\npH: 5.5\nSG: 1.025\nProtein: Trace\nGlucose: Negative\nBlood: 1+\nLeucocyte esterase: 3+\nNitrites: Positive\n\nMicroscopy (40x HPF):\nWBCs: 40-60/HPF (numerous)\nRBCs: 5-8/HPF\nBacteria: Moderate rod-shaped\nEpithelial: Few squamous\nTransitional cells: Occasional\nCasts: None",
+    "teachingPoints": [
+      "Pyuria (>5 WBCs/HPF) combined with bacteriuria and positive nitrites is the classic triad for acute bacterial UTI",
+      "Gram-negative rods (E. coli morphology) are the most common uropathogen, accounting for 60-80% of uncomplicated UTIs",
+      "Nitrite-positive urine confirms the presence of nitrate-reducing bacteria — false negatives occur with Gram-positive organisms and short bladder incubation time",
+      "Few squamous epithelial cells (<5/HPF) confirms a clean-catch midstream specimen — high counts indicate contamination and require recollection",
+      "In Ghana, increasing E. coli resistance to ampicillin (>60%) and cotrimoxazole (>50%) makes culture and sensitivity essential before empirical treatment"
+    ],
+    "fields": [],
+    "urineConfig": {
+      "seed": 40001,
+      "pusCells": 200, "rbcs": 35, "epithelial": 3, "urothelialEpi": 3, "tubularEpi": 0,
+      "calciumOxalate": 0, "triplePhosphate": 0, "uricAcid": 0, "ammoniumBiurate": 0, "amorphousCrystals": 0,
+      "hyalineCasts": 0, "granularCasts": 0, "yeast": 0,
+      "bacteria": 150, "spermatozoa": 0, "clueCells": 0, "mucusThreads": 2,
+      "fields": [{ "seed": 40001 }, { "seed": 40002 }, { "seed": 40003 }]
+    },
+    "source": "SVG-generated urine sediment simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "urine-candida-uti",
+    "title": "Candida UTI",
+    "discipline": "urinalysis",
+    "category": "Urine R/E",
+    "clinicalHistory": "55-year-old female diabetic (type 2, poorly controlled HbA1c 10.1%) from Kumasi, Ashanti Region, admitted to KATH with diabetic foot ulcer. Indwelling urethral catheter in situ for 8 days. Received IV ceftriaxone for 5 days. Now reports cloudy urine with mild suprapubic discomfort. No fever.",
+    "labData": "Urine Dipstick:\npH: 6.5\nSG: 1.015\nProtein: 1+\nGlucose: 3+ (glycosuria)\nBlood: Trace\nLE: 2+\nNitrites: Negative\n\nMicroscopy (40x HPF):\nWBCs: 15-25/HPF\nBudding yeast: Numerous\nPseudohyphae: Present\nEpithelial: Few squamous\nBacteria: Few",
+    "teachingPoints": [
+      "Budding yeast cells appear as oval refractile bodies (~4-6 µm) that may be confused with RBCs — the key distinguishing feature is budding (daughter cell attached to parent)",
+      "Pseudohyphae are elongated yeast cells joined end-to-end forming chains — their presence indicates active Candida growth, not just colonisation",
+      "Candiduria is common in diabetics (glycosuria provides substrate), catheterised patients, and those on broad-spectrum antibiotics",
+      "Negative nitrites with positive leucocyte esterase suggests a non-bacterial cause of pyuria — yeast does not reduce nitrates",
+      "Distinguish yeast from RBCs: yeast shows budding, is slightly smaller, and does not lyse in acetic acid. Add KOH to enhance yeast visualisation"
+    ],
+    "fields": [],
+    "urineConfig": {
+      "seed": 40101,
+      "pusCells": 100, "rbcs": 10, "epithelial": 4, "urothelialEpi": 1, "tubularEpi": 0,
+      "calciumOxalate": 0, "triplePhosphate": 0, "uricAcid": 0, "ammoniumBiurate": 0, "amorphousCrystals": 0,
+      "hyalineCasts": 0, "granularCasts": 0,
+      "yeast": 80, "bacteria": 20, "spermatozoa": 0, "clueCells": 0, "mucusThreads": 1,
+      "fields": [{ "seed": 40101 }, { "seed": 40102 }, { "seed": 40103 }]
+    },
+    "source": "SVG-generated urine sediment simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "urine-trichomoniasis",
+    "title": "Trichomoniasis",
+    "discipline": "urinalysis",
+    "category": "Urine R/E",
+    "clinicalHistory": "30-year-old female market trader from Accra, presenting to a reproductive health clinic with 1-week history of profuse greenish-yellow frothy vaginal discharge, vulval pruritus, and dysuria. Partner reports no symptoms. Physical examination: vulval erythema, strawberry cervix on speculum examination. Wet mount of vaginal discharge requested alongside midstream urine.",
+    "labData": "Urine Dipstick:\npH: 6.0\nSG: 1.018\nProtein: Trace\nBlood: Trace\nLE: 2+\nNitrites: Negative\n\nMicroscopy (40x HPF):\nWBCs: 20-30/HPF\nSquamous epithelial cells: 8-12/HPF\nMotile trichomonads: 5-8/HPF\nBacteria: Moderate mixed\nRBCs: 3-5/HPF",
+    "teachingPoints": [
+      "Trichomonas vaginalis is a pear-shaped flagellated protozoan (10-30 µm) with characteristic jerky, twitching motility — motility is the key to identification on wet mount",
+      "Four anterior flagella and an undulating membrane provide the distinctive motility — the organism is larger than WBCs but smaller than epithelial cells",
+      "Trichomonads are best identified in FRESH, warm specimens — motility decreases rapidly as the specimen cools, and dead organisms are difficult to distinguish from WBCs",
+      "Numerous squamous epithelial cells in this specimen suggest vaginal contamination — however, the presence of trichomonads is always significant regardless of specimen quality",
+      "Trichomoniasis is an STI — BOTH partners must be treated simultaneously with metronidazole. In Ghana, syndromic management of vaginal discharge should include screening for trichomoniasis"
+    ],
+    "fields": [],
+    "urineConfig": {
+      "seed": 40201,
+      "pusCells": 120, "rbcs": 20, "epithelial": 10, "urothelialEpi": 2, "tubularEpi": 0,
+      "calciumOxalate": 0, "triplePhosphate": 0, "uricAcid": 0, "ammoniumBiurate": 0, "amorphousCrystals": 0,
+      "hyalineCasts": 0, "granularCasts": 0,
+      "yeast": 0, "bacteria": 80, "spermatozoa": 0, "clueCells": 0, "mucusThreads": 3,
+      "trichomonas": 6,
+      "fields": [{ "seed": 40201 }, { "seed": 40202 }, { "seed": 40203 }]
+    },
+    "source": "SVG-generated urine sediment simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "urine-schistosomiasis",
+    "title": "Urinary Schistosomiasis",
+    "discipline": "urinalysis",
+    "category": "Urine R/E",
+    "clinicalHistory": "14-year-old male student from Tamale, Northern Region, presenting to the district hospital with painless terminal haematuria (blood at end of urination) for 3 weeks. Swims regularly in irrigation dam near his school. No dysuria, no fever. Physical examination unremarkable. Endemic area for S. haematobium.",
+    "labData": "Urine Dipstick:\npH: 6.5\nSG: 1.020\nProtein: 1+\nBlood: 3+ (gross haematuria)\nLE: 1+\nNitrites: Negative\n\nMicroscopy (10x and 40x):\nRBCs: Too numerous to count (TNTC)\nWBCs: 10-15/HPF\nS. haematobium eggs: 4-6 per 10 mL (concentrated)\nTransitional cells: Occasional\nCrystals: None",
+    "teachingPoints": [
+      "Schistosoma haematobium eggs have a characteristic TERMINAL SPINE — this single feature distinguishes them from S. mansoni (lateral spine) and S. japonicum (no visible spine)",
+      "Eggs are oval, 100-150 µm long, golden-brown, with a thick shell. A viable miracidium (larva) may be visible inside — viability indicates active infection",
+      "Terminal haematuria (blood at end of micturition) in a child from an endemic area is classical for urinary schistosomiasis — always examine urine for eggs",
+      "Concentration techniques (sedimentation or filtration) increase egg detection sensitivity — examine the sediment of 10 mL urine at 10x before 40x",
+      "S. haematobium is endemic in northern Ghana, especially around irrigation dams and reservoirs. Mass drug administration with praziquantel is the WHO-recommended control strategy"
+    ],
+    "fields": [],
+    "urineConfig": {
+      "seed": 40301,
+      "pusCells": 60, "rbcs": 300, "epithelial": 1, "urothelialEpi": 3, "tubularEpi": 0,
+      "calciumOxalate": 0, "triplePhosphate": 0, "uricAcid": 0, "ammoniumBiurate": 0, "amorphousCrystals": 0,
+      "hyalineCasts": 0, "granularCasts": 0,
+      "yeast": 0, "bacteria": 10, "spermatozoa": 0, "clueCells": 0, "mucusThreads": 1,
+      "schistosomaHaematobiumEggs": 5,
+      "fields": [{ "seed": 40301 }, { "seed": 40302 }, { "seed": 40303 }]
+    },
+    "source": "SVG-generated urine sediment simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "urine-contaminated-sample",
+    "title": "Contaminated Midstream Sample",
+    "discipline": "urinalysis",
+    "category": "Urine R/E",
+    "clinicalHistory": "45-year-old female from Koforidua, Eastern Region, presenting for routine antenatal check-up at 20 weeks gestation. No urinary symptoms. Midstream urine collected for routine screening. Patient reports difficulty collecting specimen.",
+    "labData": "Urine Dipstick:\npH: 6.5\nSG: 1.015\nProtein: Negative\nGlucose: Negative\nBlood: Negative\nLE: Trace\nNitrites: Negative\n\nMicroscopy (40x HPF):\nSquamous epithelial cells: >20/HPF (numerous)\nBacteria: Mixed morphology, moderate\nMucus threads: Numerous\nWBCs: 2-3/HPF\nRBCs: 0-1/HPF",
+    "teachingPoints": [
+      "Numerous squamous epithelial cells (>5/HPF) indicate contamination from vulvovaginal skin — this specimen is UNSATISFACTORY and should be recollected",
+      "Mixed bacterial flora with epithelial cells suggests contamination rather than true infection — a single organism type in pure culture would suggest true bacteriuria",
+      "The MLS should flag this specimen as 'contaminated' and request recollection with proper clean-catch technique instruction",
+      "Mucus threads are normal in small amounts but numerous threads often accompany contaminated specimens from the lower genital tract",
+      "Proper MSU collection technique: cleanse periurethral area, discard first portion of urine, collect midstream portion in sterile container — demonstrate to patient if needed"
+    ],
+    "fields": [],
+    "urineConfig": {
+      "seed": 40401,
+      "pusCells": 12, "rbcs": 5, "epithelial": 25, "urothelialEpi": 2, "tubularEpi": 0,
+      "calciumOxalate": 0, "triplePhosphate": 0, "uricAcid": 0, "ammoniumBiurate": 0, "amorphousCrystals": 0,
+      "hyalineCasts": 0, "granularCasts": 0,
+      "yeast": 0, "bacteria": 100, "spermatozoa": 0, "clueCells": 0, "mucusThreads": 15,
+      "fields": [{ "seed": 40401 }, { "seed": 40402 }, { "seed": 40403 }]
+    },
+    "source": "SVG-generated urine sediment simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "urine-pyelonephritis",
+    "title": "Pyelonephritis",
+    "discipline": "urinalysis",
+    "category": "Urine R/E",
+    "clinicalHistory": "28-year-old female from Cape Coast, Central Region, presenting to the emergency department with 2-day history of high fever (39.8°C), rigors, severe right flank pain radiating to the groin, nausea, and vomiting. 5-day history of dysuria and frequency preceding the fever. Positive costovertebral angle tenderness on the right.",
+    "labData": "Urine Dipstick:\npH: 5.5\nSG: 1.028\nProtein: 2+\nBlood: 2+\nLE: 3+\nNitrites: Positive\n\nMicroscopy (40x HPF):\nWBCs: >100/HPF (sheets of pus cells)\nWBC clumps: Present\nGranular casts: 2-3/LPF\nBacteria: Numerous rods\nRBCs: 15-20/HPF\nTransitional cells: Few\n\nFBC: WBC 18.4 × 10⁹/L, CRP 186 mg/L",
+    "teachingPoints": [
+      "Sheets of WBCs (>100/HPF), WBC clumps, and WBC/granular casts distinguish UPPER UTI (pyelonephritis) from lower UTI",
+      "WBC casts are pathognomonic for pyelonephritis — they are cylindrical moulds containing embedded leucocytes formed in the renal tubules",
+      "Granular casts in the setting of pyuria indicate renal parenchymal involvement — the infection has ascended from the bladder to the kidneys",
+      "Pyelonephritis requires IV antibiotics and close monitoring — unlike simple cystitis, it can lead to sepsis, renal abscess, or chronic kidney damage",
+      "WBC clumps (aggregates of 5+ pus cells) suggest intense inflammation — they are more commonly seen in upper tract infection than simple cystitis"
+    ],
+    "fields": [],
+    "urineConfig": {
+      "seed": 40501,
+      "pusCells": 350, "rbcs": 80, "epithelial": 2, "urothelialEpi": 4, "tubularEpi": 2,
+      "calciumOxalate": 0, "triplePhosphate": 0, "uricAcid": 0, "ammoniumBiurate": 0, "amorphousCrystals": 0,
+      "hyalineCasts": 1, "granularCasts": 4,
+      "yeast": 0, "bacteria": 200, "spermatozoa": 0, "clueCells": 0, "mucusThreads": 2,
+      "fields": [{ "seed": 40501 }, { "seed": 40502 }, { "seed": 40503 }]
+    },
+    "source": "SVG-generated urine sediment simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "urine-catheter-uti",
+    "title": "Catheter-Associated UTI",
+    "discipline": "urinalysis",
+    "category": "Urine R/E",
+    "clinicalHistory": "68-year-old male from Tamale, Northern Region, admitted to Tamale Teaching Hospital following a stroke 10 days ago. Indwelling urinary catheter placed on admission. Now febrile (38.6°C) with cloudy, foul-smelling urine. Catheter specimen of urine (CSU) sent for analysis.",
+    "labData": "Urine Dipstick:\npH: 8.0 (alkaline)\nSG: 1.010\nProtein: 1+\nBlood: 1+\nLE: 3+\nNitrites: Positive\n\nMicroscopy (40x HPF):\nWBCs: 50-80/HPF\nBacteria: Numerous mixed (rods + cocci)\nYeast: Occasional budding forms\nTransitional cells: 3-5/HPF\nTriple phosphate crystals: Few\nMucus: Moderate",
+    "teachingPoints": [
+      "Catheter-associated UTI (CAUTI) is the most common healthcare-associated infection — polymicrobial infection with mixed bacterial flora is characteristic",
+      "Alkaline urine (pH 8.0) with triple phosphate crystals suggests infection by urease-producing organisms (Proteus, Klebsiella) that split urea to ammonia",
+      "Mixed organisms (both rods and cocci) are typical of CAUTI — this contrasts with community-acquired UTI which usually involves a single pathogen",
+      "Transitional cells may be increased due to catheter-related mechanical irritation of the bladder mucosa — not necessarily indicative of malignancy",
+      "Candida in catheterised patients may represent colonisation rather than true infection — clinical correlation (fever, pyuria) is needed to distinguish"
+    ],
+    "fields": [],
+    "urineConfig": {
+      "seed": 40601,
+      "pusCells": 250, "rbcs": 30, "epithelial": 2, "urothelialEpi": 5, "tubularEpi": 0,
+      "calciumOxalate": 0, "triplePhosphate": 4, "uricAcid": 0, "ammoniumBiurate": 0, "amorphousCrystals": 2,
+      "hyalineCasts": 0, "granularCasts": 0,
+      "yeast": 12, "bacteria": 180, "spermatozoa": 0, "clueCells": 0, "mucusThreads": 6,
+      "fields": [{ "seed": 40601 }, { "seed": 40602 }, { "seed": 40603 }]
+    },
+    "source": "SVG-generated urine sediment simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "urine-tubular-injury",
+    "title": "Renal Tubular Injury with Secondary Infection",
+    "discipline": "urinalysis",
+    "category": "Urine R/E",
+    "clinicalHistory": "42-year-old male gold miner from Tarkwa, Western Region, admitted to Effia-Nkwanta Regional Hospital with acute kidney injury following ingestion of herbal remedy containing mercury compounds 5 days ago. Now febrile with decreased urine output. Serum creatinine rising rapidly.",
+    "labData": "Urine Dipstick:\npH: 5.5\nSG: 1.008 (dilute — impaired concentrating ability)\nProtein: 3+\nGlucose: 2+ (tubular glycosuria)\nBlood: 2+\nLE: 2+\nNitrites: Positive\n\nMicroscopy (40x HPF):\nRenal tubular epithelial cells: 8-12/HPF\nGranular casts: 5-8/LPF\nWBCs: 30-40/HPF\nRBCs: 15-20/HPF\nBacteria: Moderate rods\nOval fat bodies: Few",
+    "teachingPoints": [
+      "Renal tubular epithelial (RTE) cells are small round cells with a large nucleus and high N:C ratio — they are the KEY indicator of acute tubular injury",
+      "RTE cells with golden-brown pigmented granules indicate tubular necrosis with haemoglobin/myoglobin reabsorption — a critical finding that must be reported urgently",
+      "Granular casts containing degenerating RTE cells confirm intrarenal pathology — they form within damaged renal tubules",
+      "Tubular glycosuria (glucose in urine despite normal blood glucose) indicates proximal tubular dysfunction — the tubules cannot reabsorb filtered glucose",
+      "Herbal remedy nephrotoxicity is a significant cause of AKI in Ghana — heavy metals (mercury, lead) in traditional preparations cause direct tubular damage"
+    ],
+    "fields": [],
+    "urineConfig": {
+      "seed": 40701,
+      "pusCells": 140, "rbcs": 70, "epithelial": 2, "urothelialEpi": 1, "tubularEpi": 10,
+      "calciumOxalate": 0, "triplePhosphate": 0, "uricAcid": 0, "ammoniumBiurate": 0, "amorphousCrystals": 0,
+      "hyalineCasts": 2, "granularCasts": 7,
+      "yeast": 0, "bacteria": 100, "spermatozoa": 0, "clueCells": 0, "mucusThreads": 2,
+      "fields": [{ "seed": 40701 }, { "seed": 40702 }, { "seed": 40703 }]
+    },
+    "source": "SVG-generated urine sediment simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "urine-asymptomatic-candiduria",
+    "title": "Asymptomatic Candiduria",
+    "discipline": "urinalysis",
+    "category": "Urine R/E",
+    "clinicalHistory": "72-year-old female diabetic (type 2) from Sunyani, Bono Region, attending routine diabetes clinic follow-up. HbA1c 8.8%. No urinary symptoms. Routine urine screening performed. Patient on metformin and glimepiride.",
+    "labData": "Urine Dipstick:\npH: 6.0\nSG: 1.020\nProtein: Trace\nGlucose: 2+\nBlood: Negative\nLE: Trace\nNitrites: Negative\n\nMicroscopy (40x HPF):\nBudding yeast: 10-15/HPF\nWBCs: 2-4/HPF\nRBCs: 0-1/HPF\nEpithelial: Few squamous\nBacteria: Few",
+    "teachingPoints": [
+      "Candiduria without significant pyuria (<5 WBCs/HPF) suggests COLONISATION rather than true infection — this distinction is clinically critical",
+      "Asymptomatic candiduria in diabetics is common due to glycosuria — treatment is generally NOT indicated unless the patient is symptomatic or immunocompromised",
+      "The MLS should report the finding objectively: 'Budding yeast cells, 10-15/HPF. WBCs 2-4/HPF' — the clinician decides on the significance",
+      "Budding yeast must be carefully distinguished from RBCs and air bubbles — budding forms have a characteristic narrow-necked daughter cell attached",
+      "Poorly controlled diabetes (HbA1c >8%) is the strongest risk factor for candiduria — improved glycaemic control often resolves the candiduria without antifungals"
+    ],
+    "fields": [],
+    "urineConfig": {
+      "seed": 40801,
+      "pusCells": 15, "rbcs": 3, "epithelial": 4, "urothelialEpi": 0, "tubularEpi": 0,
+      "calciumOxalate": 0, "triplePhosphate": 0, "uricAcid": 0, "ammoniumBiurate": 0, "amorphousCrystals": 0,
+      "hyalineCasts": 0, "granularCasts": 0,
+      "yeast": 45, "bacteria": 10, "spermatozoa": 0, "clueCells": 0, "mucusThreads": 1,
+      "fields": [{ "seed": 40801 }, { "seed": 40802 }, { "seed": 40803 }]
+    },
+    "source": "SVG-generated urine sediment simulation",
+    "license": "Educational use"
+  },
+  {
+    "id": "urine-trichomoniasis-uti",
+    "title": "Trichomoniasis with Secondary UTI",
+    "discipline": "urinalysis",
+    "category": "Urine R/E",
+    "clinicalHistory": "26-year-old female sex worker from Kumasi, Ashanti Region, presenting to an STI clinic with 10-day history of profuse malodorous vaginal discharge, vulval itching, dysuria, and urinary frequency. Reports multiple sexual partners. Physical examination: frothy greenish discharge, vulvovaginal erythema, cervical petechiae ('strawberry cervix').",
+    "labData": "Urine Dipstick:\npH: 6.5\nSG: 1.020\nProtein: Trace\nBlood: 1+\nLE: 3+\nNitrites: Positive\n\nMicroscopy (40x HPF):\nWBCs: 30-50/HPF\nMotile trichomonads: 8-12/HPF\nSquamous epithelial cells: 10-15/HPF\nBacteria: Numerous mixed\nRBCs: 5-8/HPF",
+    "teachingPoints": [
+      "Coexisting trichomoniasis and bacterial UTI is common — Trichomonas disrupts the vaginal flora allowing bacterial ascension into the urinary tract",
+      "Numerous squamous epithelial cells with trichomonads and mixed bacteria indicate genital tract contamination — but the trichomonads and pyuria are clinically significant regardless",
+      "Trichomoniasis increases susceptibility to other STIs including HIV — comprehensive STI screening should be offered",
+      "Treatment requires metronidazole for trichomoniasis PLUS targeted antibiotics for the UTI component — treat both conditions simultaneously",
+      "The MLS should report both findings clearly: 'Motile trichomonads identified. Significant pyuria with bacteriuria. Recommend culture and STI screening.'"
+    ],
+    "fields": [],
+    "urineConfig": {
+      "seed": 40901,
+      "pusCells": 160, "rbcs": 30, "epithelial": 14, "urothelialEpi": 2, "tubularEpi": 0,
+      "calciumOxalate": 0, "triplePhosphate": 0, "uricAcid": 0, "ammoniumBiurate": 0, "amorphousCrystals": 0,
+      "hyalineCasts": 0, "granularCasts": 0,
+      "yeast": 0, "bacteria": 160, "spermatozoa": 0, "clueCells": 0, "mucusThreads": 4,
+      "trichomonas": 10,
+      "fields": [{ "seed": 40901 }, { "seed": 40902 }, { "seed": 40903 }]
     },
     "source": "SVG-generated urine sediment simulation",
     "license": "Educational use"

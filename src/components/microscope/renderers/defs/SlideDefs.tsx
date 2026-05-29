@@ -112,11 +112,17 @@ export function SlideDefs({ stain }: { stain: StainProfile }) {
         <stop offset="100%" stopColor="rgba(200,208,220,0.04)" />
       </radialGradient>
 
-      {/* WBC nucleus texture */}
+      {/* WBC nucleus texture — coarse chromatin clumping, uniformly dark */}
       <filter id="nucleus-tex" x="-5%" y="-5%" width="110%" height="110%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed={11} result="nz" />
+        <feTurbulence type="fractalNoise" baseFrequency="0.45" numOctaves="4" seed={11} result="nz" />
         <feColorMatrix in="nz" type="saturate" values="0" result="bw" />
-        <feBlend in="SourceGraphic" in2="bw" mode="multiply" result="textured" />
+        {/* Raise the noise floor so dark areas stay dark — no bright washout */}
+        <feComponentTransfer in="bw" result="raised">
+          <feFuncR type="linear" slope="0.3" intercept="0.7" />
+          <feFuncG type="linear" slope="0.3" intercept="0.7" />
+          <feFuncB type="linear" slope="0.3" intercept="0.7" />
+        </feComponentTransfer>
+        <feBlend in="SourceGraphic" in2="raised" mode="multiply" result="textured" />
         <feComposite in="textured" in2="SourceGraphic" operator="in" />
       </filter>
 
@@ -146,9 +152,9 @@ export function SlideDefs({ stain }: { stain: StainProfile }) {
         <feComposite in="cblur" in2="SourceGraphic" operator="in" />
       </filter>
 
-      {/* WBC softening */}
+      {/* WBC softening — subtle, keeps nuclear edges crisp */}
       <filter id="wbc-soft">
-        <feGaussianBlur stdDeviation="0.12" />
+        <feGaussianBlur stdDeviation="0.08" />
       </filter>
     </defs>
   );

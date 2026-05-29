@@ -129,3 +129,112 @@ export function irregularCellPath(
   }
   return d + "Z";
 }
+
+// ---------- Segmented nucleus path (spine-based) ----------
+
+/**
+ * Generate a segmented nuclear outline shaped like a curved ribbon
+ * that has been pinched into segments.
+ *
+ * Think: "a thick C-shaped sausage pinched several times."
+ *
+ * The nucleus is built along a curved SPINE (arc/horseshoe), with
+ * variable width: wide at lobe centres, narrow at constrictions.
+ * This avoids radial star/flower/pinwheel patterns entirely.
+ *
+ * @param lobeCount   Number of segments (3-4 for neutrophil, 2 for eosinophil)
+ * @param arcR        Radius of the spine arc (distance from cell centre to ribbon centre)
+ * @param lobeHW      Half-width of the ribbon at lobe centres
+ * @param constrHW    Half-width at constrictions (the pinch)
+ */
+export function lobulatedNucleusPath(
+  rng: () => number,
+  lobeCount: number,
+  arcR: number,
+  lobeHW: number,
+  constrHW: number,
+  nPts: number = 30,
+): string {
+  const arcStart = rng() * Math.PI * 2;
+  const arcSpan = Math.PI * (1.3 + rng() * 0.4); // longer C-shape: 234°–306°
+
+  // Lobe size hierarchy: one dominant, one small, rest medium
+  const amps: number[] = [];
+  {
+    const raw: number[] = [];
+    for (let l = 0; l < lobeCount; l++) raw.push(rng());
+    const srt = [...raw].sort((a, b) => b - a);
+    for (let l = 0; l < lobeCount; l++) {
+      const rank = srt.indexOf(raw[l]);
+      amps.push(
+        rank === 0 ? 1.05 + rng() * 0.15          // dominant
+        : rank === lobeCount - 1 ? 0.6 + rng() * 0.15 // smallest
+        : 0.75 + rng() * 0.15,                     // medium
+      );
+    }
+  }
+
+  // ── Build outer and inner edges along the spine arc ──
+  const outerPts: [number, number][] = [];
+  const innerPts: [number, number][] = [];
+
+  for (let i = 0; i <= nPts; i++) {
+    const t = i / nPts;
+    const angle = arcStart + t * arcSpan + (rng() - 0.5) * 0.07;
+    const rS = arcR + (rng() - 0.5) * 0.18;
+
+    // Width profile — cos² gives lobeCount peaks with constrictions between
+    const wFactor = Math.pow(Math.cos(t * (lobeCount - 1) * Math.PI), 2);
+    const lobeIdx = Math.min(lobeCount - 1, Math.round(t * (lobeCount - 1)));
+    const hw = constrHW + (lobeHW - constrHW) * wFactor * amps[lobeIdx]
+             + (rng() - 0.5) * 0.05;
+
+    const c = Math.cos(angle), s = Math.sin(angle);
+    outerPts.push([c * (rS + hw), s * (rS + hw)]);
+    innerPts.push([c * Math.max(0.15, rS - hw), s * Math.max(0.15, rS - hw)]);
+  }
+
+  // ── Rounded caps at each end ──
+  function semicap(angle: number, hw: number, fromOuterToInner: boolean): [number, number][] {
+    const cx = Math.cos(angle) * arcR, cy = Math.sin(angle) * arcR;
+    const nx = Math.cos(angle), ny = Math.sin(angle);
+    const tx = -Math.sin(angle), ty = Math.cos(angle);
+    const dir = fromOuterToInner ? 1 : -1;
+    const cap: [number, number][] = [];
+    for (let j = 1; j <= 3; j++) {
+      const phi = (j / 4) * Math.PI * dir;
+      cap.push([
+        cx + (nx * Math.cos(phi) + tx * Math.sin(phi)) * hw,
+        cy + (ny * Math.cos(phi) + ty * Math.sin(phi)) * hw,
+      ]);
+    }
+    return cap;
+  }
+
+  const endAngle = arcStart + arcSpan;
+  const endHW = constrHW + (lobeHW - constrHW) * amps[lobeCount - 1] * 0.7;
+  const startHW = constrHW + (lobeHW - constrHW) * amps[0] * 0.7;
+
+  const allPts: [number, number][] = [
+    ...outerPts,
+    ...semicap(endAngle, endHW, true),
+    ...[...innerPts].reverse(),
+    ...semicap(arcStart, startHW, false),
+  ];
+
+  // ── Catmull-Rom → cubic Bézier ──
+  const np = allPts.length;
+  let d = `M${allPts[0][0].toFixed(2)},${allPts[0][1].toFixed(2)}`;
+  for (let i = 0; i < np; i++) {
+    const p0 = allPts[(i - 1 + np) % np];
+    const p1 = allPts[i];
+    const p2 = allPts[(i + 1) % np];
+    const p3 = allPts[(i + 2) % np];
+    const cp1x = p1[0] + (p2[0] - p0[0]) / 6;
+    const cp1y = p1[1] + (p2[1] - p0[1]) / 6;
+    const cp2x = p2[0] - (p3[0] - p1[0]) / 6;
+    const cp2y = p2[1] - (p3[1] - p1[1]) / 6;
+    d += `C${cp1x.toFixed(2)},${cp1y.toFixed(2)},${cp2x.toFixed(2)},${cp2y.toFixed(2)},${p2[0].toFixed(2)},${p2[1].toFixed(2)}`;
+  }
+  return d + "Z";
+}

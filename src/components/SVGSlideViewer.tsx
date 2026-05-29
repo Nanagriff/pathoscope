@@ -40,6 +40,42 @@ const ZOOM_STEP = 1.12;
 const INERTIA_DECAY = 0.92;
 const INERTIA_MIN = 0.05;
 
+// ── Microscope objectives ──
+// ×100 oil shows ~20 RBCs across the field — matching real eyepiece view.
+const OBJECTIVES_ALL = [
+  { label: "×10", zoom: 0.8, color: "#4ade80", desc: "Scanning" },
+  { label: "×40", zoom: 1.6, color: "#60a5fa", desc: "High dry" },
+  { label: "×100", zoom: 2.2, color: "#f59e0b", desc: "Oil immersion" },
+] as const;
+
+// Malaria microscopy: only ×100 oil immersion
+const OBJECTIVES_MALARIA = [
+  { label: "×100", zoom: 2.2, color: "#f59e0b", desc: "Oil immersion" },
+] as const;
+
+type Objective = { label: string; zoom: number; color: string; desc: string };
+
+/** Find nearest objective for a given zoom value */
+function nearestObjective(z: number, objs: readonly Objective[]): Objective {
+  let best: Objective = objs[0];
+  let bestDist = Infinity;
+  for (const obj of objs) {
+    const dist = Math.abs(Math.log(z) - Math.log(obj.zoom));
+    if (dist < bestDist) { bestDist = dist; best = obj; }
+  }
+  return best;
+}
+
+/** Get next/prev objective (for scroll stepping) */
+function stepObjective(currentZoom: number, direction: 1 | -1, objs: readonly Objective[]): number {
+  const cur = nearestObjective(currentZoom, objs);
+  const idx = objs.findIndex(o => o.label === cur.label);
+  const next = idx + direction;
+  if (next < 0) return objs[0].zoom;
+  if (next >= objs.length) return objs[objs.length - 1].zoom;
+  return objs[next].zoom;
+}
+
 // ── Public interfaces ──
 
 export interface SVGFieldConfig {
@@ -292,8 +328,9 @@ export default function SVGSlideViewer({
   initialFilmType,
   focusIndicator,
 }: SVGSlideViewerProps) {
+  const objectives = showFilmToggle ? OBJECTIVES_MALARIA : OBJECTIVES_ALL;
   const maxZoom = examMode ? MAX_ZOOM_EXAM : MAX_ZOOM_DEFAULT;
-  const defaultZoom = examMode ? 1.2 : 3.5;
+  const defaultZoom = examMode ? 1.2 : objectives[0].zoom;
 
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -328,7 +365,7 @@ export default function SVGSlideViewer({
   const thinFields = useMemo(() => {
     return fieldConfigs.map((fc) => {
       const cfg = {
-        width: SLIDE_W, height: SLIDE_H, cellSpacing: 7.6,
+        width: SLIDE_W, height: SLIDE_H, cellSpacing: 9.2,
         parasitemia: fc.parasitemia ?? defaultParasitemia,
         seed: fc.seed, smearDirection: 12,
         focusCenter: [0.50, 0.50] as [number, number], focusRadius: 350,
@@ -342,7 +379,7 @@ export default function SVGSlideViewer({
   const thickFields = useMemo(() => {
     return fieldConfigs.map((fc) => {
       const cfg = {
-        width: SLIDE_W, height: SLIDE_H, cellSpacing: 7.6,
+        width: SLIDE_W, height: SLIDE_H, cellSpacing: 9.2,
         parasitemia: fc.parasitemia ?? defaultParasitemia,
         seed: fc.seed + 99999,
         species, stageWeights,
@@ -435,33 +472,10 @@ export default function SVGSlideViewer({
     if (dragRef.current) dragRef.current.active = false;
   }, []);
 
-  // ── Wheel zoom (desktop) ──
-  useEffect(() => {
-    const svg = svgRef.current;
-    if (!svg) return;
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      const cam = cameraRef.current;
-      const factor = e.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP;
-      const newZoom = Math.min(maxZoom, Math.max(MIN_ZOOM, cam.zoom * factor));
-      const rect = svg.getBoundingClientRect();
-      const px = (e.clientX - rect.left) / rect.width;
-      const py = (e.clientY - rect.top) / rect.height;
-      const viewW = SLIDE_W / cam.zoom;
-      const viewH = viewW / (rect.width / rect.height);
-      const worldX = cam.x - viewW / 2 + px * viewW;
-      const worldY = cam.y - viewH / 2 + py * viewH;
-      const newViewW = SLIDE_W / newZoom;
-      const newViewH = newViewW / (rect.width / rect.height);
-      cam.x = worldX + (0.5 - px) * newViewW;
-      cam.y = worldY + (0.5 - py) * newViewH;
-      cam.zoom = newZoom;
-      setZoom(newZoom);
-      applyCamera();
-    };
-    svg.addEventListener("wheel", onWheel, { passive: false });
-    return () => svg.removeEventListener("wheel", onWheel);
-  }, [applyCamera]);
+  // ── Wheel zoom ref (resolved after zoomTo is declared) ──
+  const wheelTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wheelSteppingRef = useRef(false);
+  const zoomToRef = useRef<(z: number) => void>(() => {});
 
   // ── Touch: pinch-to-zoom + two-finger pan (mobile) ──
   const touchRef = useRef<{ startDist: number; startZoom: number; startMidX: number; startMidY: number; camStartX: number; camStartY: number } | null>(null);
@@ -534,6 +548,35 @@ export default function SVGSlideViewer({
     requestAnimationFrame(animate);
   }, [applyCamera]);
 
+  // Wire up ref so wheel handler can call zoomTo
+  zoomToRef.current = zoomTo;
+
+  // ── Wheel: step between objectives (with debounce) ──
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      if (examMode) {
+        const cam = cameraRef.current;
+        const factor = e.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP;
+        cam.zoom = Math.min(maxZoom, Math.max(MIN_ZOOM, cam.zoom * factor));
+        setZoom(cam.zoom);
+        applyCamera();
+        return;
+      }
+      if (wheelSteppingRef.current) return;
+      wheelSteppingRef.current = true;
+      const dir: 1 | -1 = e.deltaY < 0 ? 1 : -1;
+      const target = stepObjective(cameraRef.current.zoom, dir, showFilmToggle ? OBJECTIVES_MALARIA : OBJECTIVES_ALL);
+      zoomToRef.current(target);
+      if (wheelTimeoutRef.current) clearTimeout(wheelTimeoutRef.current);
+      wheelTimeoutRef.current = setTimeout(() => { wheelSteppingRef.current = false; }, 400);
+    };
+    svg.addEventListener("wheel", onWheel, { passive: false });
+    return () => svg.removeEventListener("wheel", onWheel);
+  }, [applyCamera, examMode, maxZoom]);
+
   // ── Animated pan + zoom to annotation ──
   const goToAnnotation = useCallback((a: CellAnnotation) => {
     const cam = cameraRef.current;
@@ -560,7 +603,7 @@ export default function SVGSlideViewer({
     setActiveAnnotation(null);
     // Reset camera
     cameraRef.current = { x: SLIDE_W / 2, y: SLIDE_H / 2, zoom: defaultZoom };
-    setZoom(3.5);
+    setZoom(defaultZoom);
     setTimeout(() => {
       setCurrentField(index);
       setTransitioning(false);
@@ -571,11 +614,13 @@ export default function SVGSlideViewer({
   const handlePrevField = () => changeField(Math.max(0, currentField - 1));
   const handleNextField = () => changeField(Math.min(fieldConfigs.length - 1, currentField + 1));
 
-  const handleZoomIn = () => zoomTo(Math.min(maxZoom, cameraRef.current.zoom * 1.5));
-  const handleZoomOut = () => zoomTo(Math.max(MIN_ZOOM, cameraRef.current.zoom / 1.5));
+  const handleObjective = (targetZoom: number) => {
+    zoomTo(targetZoom);
+  };
   const handleHome = () => {
-    cameraRef.current = { x: SLIDE_W / 2, y: SLIDE_H / 2, zoom: defaultZoom };
-    setZoom(3.5);
+    const objs = showFilmToggle ? OBJECTIVES_MALARIA : OBJECTIVES_ALL;
+    cameraRef.current = { x: SLIDE_W / 2, y: SLIDE_H / 2, zoom: objs[0].zoom };
+    setZoom(objs[0].zoom);
     setActiveAnnotation(null);
     applyCamera();
   };
@@ -691,11 +736,37 @@ export default function SVGSlideViewer({
 
         <div className="w-px h-5 bg-gray-700 mx-0.5" />
 
-        {/* Zoom */}
-        <button onClick={handleZoomIn} className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded bg-gray-800 hover:bg-gray-700 text-sm sm:text-xs font-bold">+</button>
-        <button onClick={handleZoomOut} className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded bg-gray-800 hover:bg-gray-700 text-sm sm:text-xs font-bold">&minus;</button>
+        {/* Objective selector */}
+        {!examMode && (
+          <div className="flex items-center bg-gray-800 rounded overflow-hidden">
+            {objectives.map((obj) => {
+              const active = nearestObjective(zoom, objectives).label === obj.label;
+              return (
+                <button key={obj.label} onClick={() => handleObjective(obj.zoom)}
+                  className={`h-7 px-2.5 text-[10px] font-semibold transition-all duration-200 ${
+                    active
+                      ? "text-white"
+                      : "text-gray-400 hover:text-gray-200"
+                  }`}
+                  style={active ? { backgroundColor: obj.color + "30", color: obj.color } : undefined}
+                  title={`${obj.label} — ${obj.desc}`}>
+                  {obj.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+        {examMode && (
+          <>
+            <button onClick={() => zoomTo(Math.min(maxZoom, cameraRef.current.zoom * 1.5))} className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded bg-gray-800 hover:bg-gray-700 text-sm sm:text-xs font-bold">+</button>
+            <button onClick={() => zoomTo(Math.max(MIN_ZOOM, cameraRef.current.zoom / 1.5))} className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center rounded bg-gray-800 hover:bg-gray-700 text-sm sm:text-xs font-bold">&minus;</button>
+          </>
+        )}
         <button onClick={handleHome} className="px-2 h-7 rounded bg-gray-800 hover:bg-gray-700 text-[10px] font-medium hidden sm:flex items-center">Home</button>
-        <span className="text-[10px] text-gray-300 tabular-nums">{zoom.toFixed(1)}x</span>
+        <span className="text-[10px] tabular-nums" style={{ color: nearestObjective(zoom, objectives).color }}>
+          {nearestObjective(zoom, objectives).label}
+          <span className="text-gray-500 ml-1 hidden sm:inline">{nearestObjective(zoom, objectives).desc}</span>
+        </span>
 
         <div className="flex-1" />
 

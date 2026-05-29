@@ -90,21 +90,21 @@ export const GIEMSA: StainProfile = {
   // Light lavender/blue-tinged background — characteristic Giemsa cast
   background: "#eee8f2",
 
-  // Purple-pink/lavender RBCs — blue-purple cast, NOT warm salmon
+  // Pink-lavender RBCs — lighter, more pink than purple
   rbcGradients: [
-    // Normal staining — lavender-pink with purple rim
-    ["#f0eaf4", "#d8c4d8", "#c4a4bc", "#b08ca8", "#a880a0"],
-    ["#eee8f2", "#d6c0d4", "#c2a0b8", "#ae88a4", "#a67c9c"],
+    // Normal staining — soft pink with lavender rim
+    ["#f6f0f6", "#e4ccd8", "#d4b0c0", "#c49cac", "#b88ca0"],
+    ["#f4eef4", "#e2c8d4", "#d0acbc", "#c298a8", "#b6889c"],
     // Slightly deeper stain
-    ["#ece6f0", "#d2bcd0", "#be9cb4", "#aa84a0", "#a27898"],
-    ["#eae4ee", "#d0b8cc", "#bc98b0", "#a8809c", "#a07494"],
-    // Paler variants
-    ["#f2ecf6", "#dcc8dc", "#c8a8c0", "#b490ac", "#ac84a4"],
-    ["#f0eaf4", "#dac6da", "#c6a6be", "#b28ea8", "#aa82a0"],
-    // Thin smear (lighter)
-    ["#f4eef8", "#e0d0e0", "#d0b4c8", "#bc9cb4", "#b490ac"],
-    // Thick smear (deeper purple)
-    ["#e6e0ec", "#c8b0c8", "#b490a8", "#a07898", "#987090"],
+    ["#f2ecf2", "#dec4d0", "#cca8b8", "#be94a4", "#b28498"],
+    ["#f0eaf0", "#dcc0cc", "#c8a4b4", "#ba90a0", "#ae8094"],
+    // Paler variants — very light
+    ["#f8f2f8", "#e8d4dc", "#d8b8c8", "#c8a4b4", "#bc94a8"],
+    ["#f6f0f6", "#e6d0da", "#d4b4c4", "#c6a0b0", "#ba90a4"],
+    // Thin smear (lightest)
+    ["#faf4fa", "#ecdce4", "#dcc4d0", "#ccb0c0", "#c0a0b4"],
+    // Thick smear (slightly deeper)
+    ["#eee8ee", "#d4bcc8", "#c4a0b0", "#b48c9c", "#a87c90"],
   ],
 
   parasitizedRbcGradient:
@@ -118,32 +118,32 @@ export const GIEMSA: StainProfile = {
     "rgba(196,176,208,0)",
   ],
 
-  // Giemsa: both ring cytoplasm and chromatin appear dark blue-purple
-  parasiteRingStroke: "#2c1870",
-  parasiteRingFill: "rgba(40,24,100,0.08)",
-  parasiteDiffusion: "rgba(44,24,112,0.06)",
-  chromatinPrimary: "#2a1060",
-  chromatinSecondary: "#3c1880",
+  // Giemsa: parasite structures — subtle, not overly contrasty
+  parasiteRingStroke: "#3c2880",
+  parasiteRingFill: "rgba(50,34,110,0.05)",
+  parasiteDiffusion: "rgba(54,34,120,0.04)",
+  chromatinPrimary: "#3a1870",
+  chromatinSecondary: "#4c2888",
 
-  nucleusFill: "#0e0630",          // very dark purple
-  nucleusParachromatin: "#1c0c50",
-  nucleusDenseChromatin: "#060318",
+  nucleusFill: "#381268",          // dark uniform purple
+  nucleusParachromatin: "#52208c",
+  nucleusDenseChromatin: "#1a0834",
 
-  neutrophilCyto: ["#a070c0", "#8850a8"],  // deep purple
-  neutrophilGranule: "#6838a0",
+  neutrophilCyto: ["#9070b0", "#7c609c"],  // rich lavender
+  neutrophilGranule: "#4a2888",
 
-  eosinophilCyto: ["#a878c0", "#9058a8"],  // deep purple
+  eosinophilCyto: ["#ccacd4", "#b894c4"],  // pale lavender
   eosinophilGranule: [190, 50, 110],
 
-  lymphocyteCyto: ["#9868b8", "#8050a4"],  // deep purple rim
+  lymphocyteCyto: ["#b898c8", "#a480b4"],  // pale purple rim
 
-  monocyteCyto: ["#a070b8", "#8858a4"],  // deep purple
+  monocyteCyto: ["#c0a0c8", "#ac88b8"],  // pale blue-grey
 
-  basophilCyto: ["#a078b8", "#8860a8"],
-  basophilGranule: "#140840",
+  basophilCyto: ["#c0a0c8", "#ac88b8"],
+  basophilGranule: "#201060",
 
-  plateletOuter: "#d0c8dc",
-  plateletInner: "#705898",
+  plateletOuter: "#b8a8c8",
+  plateletInner: "#4c2878",
 
   membraneStroke: "#a08898",
   precipitateColour: "#241458",
@@ -180,33 +180,33 @@ export const WRIGHT_GIEMSA: StainProfile = {
     "rgba(224,184,170,0)",
   ],
 
-  parasiteRingStroke: "#5a2890",
-  parasiteRingFill: "rgba(90,40,160,0.06)",
-  parasiteDiffusion: "rgba(80,30,130,0.04)",
-  chromatinPrimary: "#8a1050",
-  chromatinSecondary: "#a01860",
+  parasiteRingStroke: "#6a3898",
+  parasiteRingFill: "rgba(100,50,170,0.04)",
+  parasiteDiffusion: "rgba(90,40,140,0.03)",
+  chromatinPrimary: "#9a2060",
+  chromatinSecondary: "#b02870",
 
-  // Dark purple nuclei — correct
-  nucleusFill: "#1a0c48",
-  nucleusParachromatin: "#2c1868",
-  nucleusDenseChromatin: "#0c0630",
+  // Deep violet-purple nuclei — dark and uniform
+  nucleusFill: "#3a1470",
+  nucleusParachromatin: "#5a2890",
+  nucleusDenseChromatin: "#1c0a3c",
 
-  // WBC cytoplasm — pale pink to pale lavender (NOT deep purple)
-  neutrophilCyto: ["#e0cce0", "#ccb4cc"],  // pale pink-lavender
-  neutrophilGranule: "#8868a8",             // purple granules
+  // WBC cytoplasm — rich lavender-purple
+  neutrophilCyto: ["#9878b8", "#8468a4"],  // rich lavender
+  neutrophilGranule: "#4a2888",             // dark purple granules
 
   eosinophilCyto: ["#e8d0d8", "#d8b8c8"],  // pale pink
-  eosinophilGranule: [210, 70, 110],        // pink-orange granules
+  eosinophilGranule: [220, 60, 100],        // vivid pink-orange granules
 
   lymphocyteCyto: ["#d4c0e0", "#c0a8cc"],  // pale blue-lavender rim
 
   monocyteCyto: ["#dccce0", "#c8b4cc"],    // pale blue-grey
 
   basophilCyto: ["#d8c8d8", "#c4b4c4"],
-  basophilGranule: "#201060",
+  basophilGranule: "#281268",
 
-  plateletOuter: "#d8c8dc",
-  plateletInner: "#7858a0",
+  plateletOuter: "#c0a8c8",
+  plateletInner: "#503080",
 
   membraneStroke: "#c09088",               // warm pink membrane
   precipitateColour: "#3a1860",

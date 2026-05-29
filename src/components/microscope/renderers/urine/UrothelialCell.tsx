@@ -1,8 +1,10 @@
 /**
  * Urothelial (transitional) epithelial cell.
- * Medium size (~30-40μm), round/oval/pear-shaped, sometimes caudate (tailed).
- * From bladder, ureters, renal pelvis. Granular cytoplasm.
- * Ref: Image 50 — clusters, round/oval/pear shapes, visible nucleus.
+ *
+ * Medium size (~30-40 µm). Shape varies: round, oval, pear-shaped, or
+ * slightly caudate (tailed). Softer contours than squamous — rounded
+ * polygon, NOT perfect pentagon/hexagon. Dense granular cytoplasm.
+ * Prominent central nucleus. From bladder, ureters, renal pelvis.
  */
 
 import { createRng, irregularCellPath } from "../../types";
@@ -13,25 +15,37 @@ interface Props { x: number; y: number; seed: number }
 
 export function UrothelialCell({ x, y, seed }: Props) {
   const rng = createRng(seed);
-  const r = n(5 + rng() * 3); // 5-8 units — medium, smaller than squamous
-  const isCaudate = rng() < 0.3; // 30% have a tail
+  const r = n(5 + rng() * 3); // 5-8 units
   const rot = n(rng() * 360);
-  const bodyOpacity = n(0.12 + rng() * 0.08);
 
-  // Round/oval outline — smoother than squamous
-  const outline = irregularCellPath(rng, r, 10, 0.12);
+  // Shape variety: round, oval, pear-shaped, or caudate
+  const shapeRoll = rng();
+  const isCaudate = shapeRoll < 0.2;
+  const isPear = shapeRoll >= 0.2 && shapeRoll < 0.45;
+  const isOval = shapeRoll >= 0.45 && shapeRoll < 0.7;
+  // else round
 
-  // Nucleus — larger relative to cell than squamous (lower N:C ratio than squamous but still visible)
-  const nucX = n((rng() - 0.5) * r * 0.2);
-  const nucY = n((rng() - 0.5) * r * 0.2);
-  const nucR = n(r * 0.25 + rng() * 0.1);
+  // Soft contours — use irregularCellPath with moderate wobble (not angular polygons)
+  const stretchX = isOval ? n(0.75 + rng() * 0.1) : isPear ? n(0.85 + rng() * 0.1) : n(0.9 + rng() * 0.15);
+  const stretchY = n(2 - stretchX);
+  const outline = irregularCellPath(rng, r, 10, 0.15);
 
-  // Cytoplasmic granularity
-  const granules = Array.from({ length: 12 + Math.floor(rng() * 8) }, () => ({
+  const bodyOpacity = n(0.15 + rng() * 0.08); // denser cytoplasm
+
+  // Pear distortion — shift bottom half outward
+  const pearBulge = isPear ? n(r * 0.3 + rng() * r * 0.2) : 0;
+
+  // Nucleus — prominent, central
+  const nucX = n((rng() - 0.5) * r * 0.15);
+  const nucY = n((rng() - 0.5) * r * 0.15 + (isPear ? -r * 0.1 : 0));
+  const nucR = n(r * 0.25 + rng() * 0.12);
+
+  // Denser cytoplasmic granularity
+  const granules = Array.from({ length: 20 + Math.floor(rng() * 15) }, () => ({
     gx: n((rng() - 0.5) * r * 1.3),
     gy: n((rng() - 0.5) * r * 1.3),
-    gr: n(0.1 + rng() * 0.12),
-    go: n(0.04 + rng() * 0.05),
+    gr: n(0.08 + rng() * 0.12),
+    go: n(0.05 + rng() * 0.06),
   }));
 
   // Caudate tail
@@ -44,24 +58,32 @@ export function UrothelialCell({ x, y, seed }: Props) {
 
   return (
     <g transform={`translate(${x},${y}) rotate(${rot})`}>
-      {/* Cell body — rounder than squamous */}
-      <path d={outline} fill="#b0b4a4" opacity={bodyOpacity} />
-      <path d={outline} fill="none" stroke="#889078" strokeWidth={0.1} opacity={n(bodyOpacity + 0.06)} />
+      {/* Cell body — soft contour, stretched for shape variety */}
+      <g transform={`scale(${stretchX},${stretchY})`}>
+        <path d={outline} fill="#b0b4a4" opacity={bodyOpacity} />
+        <path d={outline} fill="none" stroke="#788068" strokeWidth={0.12} opacity={n(bodyOpacity + 0.10)} />
+
+        {/* Cytoplasmic granularity — denser */}
+        {granules.map((g, i) => (
+          <circle key={i} cx={g.gx} cy={g.gy} r={g.gr} fill="#687060" opacity={g.go} />
+        ))}
+      </g>
+
+      {/* Pear bulge — extra lobe at one end */}
+      {isPear && (
+        <ellipse cx={0} cy={n(r * stretchY * 0.6)} rx={n(r * 0.5)} ry={n(pearBulge)}
+          fill="#b0b4a4" opacity={n(bodyOpacity * 0.8)} stroke="#788068" strokeWidth={0.08} strokeOpacity={0.12} />
+      )}
 
       {/* Caudate tail */}
       {isCaudate && (
         <path d={`M${tailStartX},${tailStartY} Q${n((tailStartX + tailEndX) / 2 + (rng() - 0.5) * 2)},${n((tailStartY + tailEndY) / 2 + (rng() - 0.5) * 2)},${tailEndX},${tailEndY}`}
-          fill="none" stroke="#a0a490" strokeWidth={n(0.4 + rng() * 0.3)} strokeOpacity={bodyOpacity} strokeLinecap="round" />
+          fill="none" stroke="#a0a490" strokeWidth={n(0.3 + rng() * 0.3)} strokeOpacity={bodyOpacity} strokeLinecap="round" />
       )}
 
-      {/* Granularity */}
-      {granules.map((g, i) => (
-        <circle key={i} cx={g.gx} cy={g.gy} r={g.gr} fill="#707868" opacity={g.go} />
-      ))}
-
-      {/* Nucleus — rounder and more prominent than squamous */}
-      <circle cx={nucX} cy={nucY} r={nucR} fill="#586050" opacity={0.2} />
-      <circle cx={nucX} cy={nucY} r={n(nucR * 0.5)} fill="#404840" opacity={0.15} />
+      {/* Prominent nucleus */}
+      <circle cx={nucX} cy={nucY} r={nucR} fill="#4a5440" opacity={0.25} />
+      <circle cx={nucX} cy={nucY} r={n(nucR * 0.55)} fill="#384030" opacity={0.2} />
     </g>
   );
 }

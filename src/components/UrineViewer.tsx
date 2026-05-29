@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useMemo, useCallback, type PointerEvent as
 import type { Camera } from "./microscope/types";
 import type { UrineConfig } from "@/data/cases";
 import { createRng } from "./microscope/types";
-import { PusCell, UrineRBC, SquamousEpithelial, UrothelialCell, TubularEpithelial, CalciumOxalate, TriplePhosphate, UricAcidCrystal, AmmoniumBiurate, AmorphousCrystals, HyalineCast, GranularCast, YeastCell, Bacteria, Spermatozoa, ClueCell, MucusThread } from "./microscope/renderers/urine";
+import { PusCell, UrineRBC, SquamousEpithelial, UrothelialCell, TubularEpithelial, CalciumOxalate, TriplePhosphate, UricAcidCrystal, AmmoniumBiurate, AmorphousCrystals, HyalineCast, GranularCast, YeastCell, Bacteria, Spermatozoa, ClueCell, MucusThread, Trichomonas, SchistosomaEgg, Microfilaria, EnterobiusEgg } from "./microscope/renderers/urine";
 
 const SLIDE_W = 400;
 const SLIDE_H = 300;
@@ -49,6 +49,17 @@ const ELEMENT_INFO: Record<string, { label: string; desc: string }> = {
   yeast: { label: "Yeast (Candida)", desc: "Oval, refractile, may show budding. Common in diabetics, immunocompromised, or female specimens. Distinguish from RBCs by budding." },
   bacteria: { label: "Bacteria", desc: "Tiny rods or cocci. Significant if >1+ in uncentrifuged specimen from clean catch. Motile rods suggest Gram-negative infection." },
   mucus: { label: "Mucus Thread", desc: "Thin wavy transparent strands. Normal finding in small amounts. Increased in lower urinary tract irritation." },
+  trichomonas: { label: "Trichomonas vaginalis", desc: "Motile flagellated protozoan, 10-30μm, pear-shaped with 4 anterior flagella and undulating membrane. Characteristic jerky twitching motility. Indicates trichomoniasis — treat patient and partner." },
+  schistoHaem: { label: "Schistosoma haematobium Egg", desc: "Oval egg 100-150μm with TERMINAL SPINE (key feature). Golden-brown thick shell, may contain miracidium. Found in urine = bladder schistosomiasis. Endemic in sub-Saharan Africa." },
+  microfilaria: { label: "Microfilaria", desc: "Larval nematode, 200-300μm, thread-like with sinusoidal body. May be sheathed. Assess tail nuclei for species ID (Wuchereria bancrofti, Brugia malayi). Nocturnal periodicity — collect blood at night." },
+  enterobius: { label: "Enterobius vermicularis Egg", desc: "Flattened D-shaped egg 50-60μm × 20-30μm. Thin smooth shell containing coiled larva. RARE in urine — usually perianal contamination. Indicates pinworm infection." },
+};
+
+// Minimum separation distances by element type
+const MIN_SEP: Record<string, number> = {
+  epi: 28, uroEpi: 14, tubEpi: 6, hyaCast: 20, granCast: 20,
+  caOx: 8, tripPhos: 10, uricAcid: 6, amBiurate: 6,
+  trichomonas: 6, schistoHaem: 14, microfilaria: 30, enterobius: 10,
 };
 
 function generateUrineField(config: UrineConfig, fieldSeed: number): UrineElement[] {
@@ -56,16 +67,33 @@ function generateUrineField(config: UrineConfig, fieldSeed: number): UrineElemen
   const elements: UrineElement[] = [];
   let id = 0;
 
+  // Track placed positions for collision avoidance
+  const placed: { x: number; y: number; r: number }[] = [];
+
   const place = (type: string, count: number) => {
     const info = ELEMENT_INFO[type];
+    const minSep = MIN_SEP[type] ?? 3;
     for (let i = 0; i < count; i++) {
+      // Try to find a non-overlapping position (up to 20 attempts)
+      let px = 10 + rng() * (SLIDE_W - 20);
+      let py = 10 + rng() * (SLIDE_H - 20);
+      for (let attempt = 0; attempt < 20; attempt++) {
+        const tooClose = placed.some(p => {
+          const dx = px - p.x, dy = py - p.y;
+          return Math.sqrt(dx * dx + dy * dy) < (minSep + p.r) * 0.5;
+        });
+        if (!tooClose) break;
+        px = 10 + rng() * (SLIDE_W - 20);
+        py = 10 + rng() * (SLIDE_H - 20);
+      }
+      placed.push({ x: px, y: py, r: minSep });
       elements.push({
         id: id++,
         type,
-        x: 10 + rng() * (SLIDE_W - 20),
-        y: 10 + rng() * (SLIDE_H - 20),
+        x: px,
+        y: py,
         seed: Math.floor(rng() * 1_000_000),
-        vx: (rng() - 0.5) * 0.02, // slow drift
+        vx: (rng() - 0.5) * 0.02,
         vy: (rng() - 0.5) * 0.015,
         label: info.label,
         description: info.desc,
@@ -73,23 +101,28 @@ function generateUrineField(config: UrineConfig, fieldSeed: number): UrineElemen
     }
   };
 
-  place("pus", config.pusCells);
-  place("rbc", config.rbcs);
+  // Place largest elements first (best spacing), then smaller
   place("epi", config.epithelial ?? 0);
+  place("hyaCast", config.hyalineCasts);
+  place("granCast", config.granularCasts);
   place("uroEpi", config.urothelialEpi ?? 0);
-  place("tubEpi", config.tubularEpi ?? 0);
   place("caOx", config.calciumOxalate ?? 0);
   place("tripPhos", config.triplePhosphate ?? 0);
   place("uricAcid", config.uricAcid ?? 0);
   place("amBiurate", config.ammoniumBiurate ?? 0);
   place("amorphous", config.amorphousCrystals ?? 0);
-  place("hyaCast", config.hyalineCasts);
-  place("granCast", config.granularCasts);
+  place("tubEpi", config.tubularEpi ?? 0);
+  place("pus", config.pusCells);
+  place("rbc", config.rbcs);
   place("yeast", config.yeast);
   place("bacteria", config.bacteria ?? 0);
-  place("sperm", config.spermatozoa ?? 0);
   place("clueCell", config.clueCells ?? 0);
+  place("sperm", config.spermatozoa ?? 0);
   place("mucus", config.mucusThreads ?? 0);
+  place("microfilaria", config.microfilaria ?? 0);
+  place("schistoHaem", config.schistosomaHaematobiumEggs ?? 0);
+  place("enterobius", config.enterobiusVermicularis ?? 0);
+  place("trichomonas", config.trichomonas ?? 0);
 
   return elements;
 }
@@ -289,6 +322,10 @@ export default function UrineViewer({ config, fields }: Props) {
       case "yeast": return <YeastCell key={el.id} x={el.x} y={el.y} seed={el.seed} />;
       case "bacteria": return <Bacteria key={el.id} x={el.x} y={el.y} seed={el.seed} animated />;
       case "mucus": return <MucusThread key={el.id} x={el.x} y={el.y} seed={el.seed} />;
+      case "trichomonas": return <Trichomonas key={el.id} x={el.x} y={el.y} seed={el.seed} animated />;
+      case "schistoHaem": return <SchistosomaEgg key={el.id} x={el.x} y={el.y} seed={el.seed} />;
+      case "microfilaria": return <Microfilaria key={el.id} x={el.x} y={el.y} seed={el.seed} animated />;
+      case "enterobius": return <EnterobiusEgg key={el.id} x={el.x} y={el.y} seed={el.seed} />;
       default: return null;
     }
   }, []);
@@ -330,8 +367,9 @@ export default function UrineViewer({ config, fields }: Props) {
 
           {/* Active annotation circle — size adapts to element */}
           {activeCell && showAnnotations && (() => {
-            const small = ["sperm", "bacteria", "rbc", "yeast", "tubEpi"].includes(activeCell.type);
-            const large = ["epi", "clueCell", "hyaCast", "granCast"].includes(activeCell.type);
+            const small = ["sperm", "bacteria", "rbc", "yeast", "tubEpi", "enterobius"].includes(activeCell.type);
+            const large = ["epi", "clueCell", "hyaCast", "granCast", "microfilaria", "schistoHaem"].includes(activeCell.type);
+            // trichomonas, pus, uroEpi, caOx etc. fall into medium (r=5)
             const r = small ? 2.5 : large ? 8 : 5;
             return (
               <g style={{ pointerEvents: "none" }}>

@@ -15,3 +15,7 @@ export { Bacteria } from "./Bacteria";
 export { Spermatozoa } from "./Spermatozoa";
 export { ClueCell } from "./ClueCell";
 export { MucusThread } from "./MucusThread";
+export { Trichomonas } from "./Trichomonas";
+export { SchistosomaEgg } from "./SchistosomaEgg";
+export { Microfilaria } from "./Microfilaria";
+export { EnterobiusEgg } from "./EnterobiusEgg";

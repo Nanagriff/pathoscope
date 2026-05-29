@@ -139,7 +139,7 @@ export function generateSlide(config: SlideConfig): GeneratedSlide {
       const nfx = Math.min(1, Math.max(0, baseX / width));
       const nfy = Math.min(1, Math.max(0, baseY / height));
       const density = sampleNoise(densityField, NGX, NGY, nfx, nfy);
-      const skipChance = density < 0.35 ? 0.02 : density > 0.7 ? 0.18 : 0.05;
+      const skipChance = density < 0.35 ? 0.08 : density > 0.7 ? 0.30 : 0.14;
       if (rng() < skipChance) continue;
 
       // Directional jitter (elongated along smear axis)
@@ -370,6 +370,34 @@ export function generateSlide(config: SlideConfig): GeneratedSlide {
       depth: Math.min(1, Math.max(0, (dist / focusRadius) * 0.6 + rng() * 0.3)),
       zIndex: 10000 + rng() * 100,
     });
+  }
+
+  // Platelet aggregates — clusters of 2-5 that can mimic schizonts
+  const clusterCount = 1 + Math.floor(rng() * 3); // 1-3 clusters per field
+  for (let c = 0; c < clusterCount; c++) {
+    const cx = 15 + rng() * (width - 30);
+    const cy = 15 + rng() * (height - 30);
+    const clusterSize = 2 + Math.floor(rng() * 4); // 2-5 platelets per cluster
+    const dist = Math.hypot(cx - fcx, cy - fcy);
+    const clusterDepth = Math.min(1, Math.max(0, (dist / focusRadius) * 0.6 + rng() * 0.2));
+    const info = CELL_DESCRIPTIONS.platelet;
+    for (let p = 0; p < clusterSize; p++) {
+      // Tight cluster — platelets touching/overlapping
+      const angle = rng() * Math.PI * 2;
+      const spread = rng() * 1.5; // very close together
+      cells.push({
+        id: id++,
+        type: "platelet",
+        x: cx + Math.cos(angle) * spread,
+        y: cy + Math.sin(angle) * spread,
+        rotation: rng() * 360,
+        seed: Math.floor(rng() * 1_000_000),
+        label: "Platelet aggregate",
+        description: "Cluster of platelets — can mimic schizont merozoites. Distinguish by lack of pigment and ring forms.",
+        depth: clusterDepth,
+        zIndex: 10000 + rng() * 100,
+      });
+    }
   }
 
   // ── Sort by zIndex ──
